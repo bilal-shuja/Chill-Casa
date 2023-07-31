@@ -76,7 +76,7 @@ const Sidebar = () => {
                 {/* Add icons to the links using the .nav-icon class
          with font-awesome or any other icon font library */}
 
-                {roleID === "1" || roleID === "6" ? (
+                {/* {roleID === "1" || roleID === "6" ? ( */}
                   <li className="nav-item menu treeview">
                     <a href="#" className="nav-link">
                       <i className="nav-icon fas fa-user mr-2" />
@@ -101,7 +101,7 @@ const Sidebar = () => {
                       </li> */}
                     </ul>
                   </li>
-                ) : null}
+                {/* // ) : null} */}
 
                 <li className="nav-item menu treeview">
                   <a href="#" className="nav-link">
@@ -122,7 +122,14 @@ const Sidebar = () => {
                     <li className="nav-item">
                         <Link to="/TherapistCategoryForm" className="nav-link ">
                           <i className="far fa-circle nav-icon" />
-                          <p>Category Form</p>
+                          <p>Services Form</p>
+                        </Link>
+                    </li>
+
+                    <li className="nav-item">
+                        <Link to="/TherapistCategorySheet" className="nav-link ">
+                          <i className="far fa-circle nav-icon" />
+                          <p>Services Sheet</p>
                         </Link>
                     </li>
 
@@ -330,7 +337,7 @@ const Sidebar = () => {
                     <li className="nav-item">
                       <Link to="/PromoSheet" className="nav-link ">
                         <i className="far fa-circle nav-icon" />
-                        <p>Promo-Code Sheet</p>
+                        <p>Promo Code Sheet</p>
                       </Link>
                     </li>
               

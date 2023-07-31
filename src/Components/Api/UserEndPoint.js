@@ -4,9 +4,8 @@ import { toast } from "react-toastify";
 import axios from 'axios';
 
 
-function getAllUsers(){
-    const getUsers =   axios.post(`${process.env.REACT_APP_BASE_URL}fetch_all_users`)
-       return getUsers;
+function getAllUsers(pages){
+    return  axios.post(`${process.env.REACT_APP_BASE_URL}fetch_all_users?page=${pages}`) 
   }
 
 

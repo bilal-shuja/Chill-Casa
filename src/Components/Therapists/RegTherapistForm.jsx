@@ -14,10 +14,23 @@ const RegTherapistForm = () => {
 
     // Therapist Form Hooks:
     const[email , setEmail] = useState('');
-    const[userName , setUsername] = useState('');
+    const[firstName, setFirstName] = useState('');
+    const[lastName,setLastName] = useState('');
+    const[phone , setPhone] = useState('');
+    const[address , setAddress] = useState('');
+    const[gender , setGender] = useState('');
+  
+    
     const[password , setPassword] = useState('');
-    const[profileImg , setProfileImg] = useState('');
+    const[profileImg , setProfileImg] = useState(null);
     const[postCode, setPostCode] = useState('');
+
+    const[qualificationImageOne , setQualificationImageOne] = useState(null);
+    const[qualificationImageTwo , setQualificationImageTwo] = useState('');
+    const[qualificationImageThree , setQualificationImageThree] = useState('');
+
+
+
 
     // loading and conditing hooks:
     const[input , setInput] = useState(false);
@@ -55,7 +68,18 @@ const RegTherapistForm = () => {
       setSelectedCategoryOptions(selectedLabels)
     };
 
-  
+    // Select Gender function:
+    const handleSelectChange = (e)=>{
+      setGender(e.target.value)
+    }
+
+    // Multiple Postcode input functions:
+    const handlePostcodeInputChange = (e)=>{
+      setPostCode(e.target.value)
+
+    }
+
+    
     // Getting therapist categories function:
     const options = category.map((category) => ({
       value: category.id,
@@ -64,7 +88,7 @@ const RegTherapistForm = () => {
 
 
 // Getting Therapist Category function:
-  useQuery('all_users',therapistCategoryEndPoint.getAllCategories,{
+  useQuery('all_categories',therapistCategoryEndPoint.getAllCategories,{
     onSuccess:(data)=>{
       setCategory(data.data.Categorys)
    },
@@ -79,19 +103,34 @@ const RegTherapistForm = () => {
 // Registering Therapist function: 
   const handleSubmitTherapistReg =  (e)=>{
     e.preventDefault();
+    const postcodeArray = postCode.split(",").map((value)=> value.trim());
+
       setLoading(true)
-      if(selectedCategoryOptions && userName && email  && profileImg){
+      if(selectedCategoryOptions  && firstName && lastName && email && password && qualificationImageOne && gender && profileImg){
 
           var formdata = new FormData();
+          formdata.append("firstname",firstName);
+          formdata.append("lastname",lastName);
           formdata.append("email", email);
-          formdata.append("therapist_name",userName);
+          formdata.append("gender", gender);
+          formdata.append("password", password);
           formdata.append("category_id", 1122);
           formdata.append("category_name", selectedCategoryOptions);
-          formdata.append("password", password);
-          formdata.append("postcode", postCode);
-          
+          formdata.append("postcode", postcodeArray);
+          formdata.append("address", address);
+          formdata.append("phone_number", phone);
+
           profileImg &&
           formdata.append("image", profileImg, "[PROXY]")
+          qualificationImageOne &&
+          formdata.append("image1", qualificationImageOne, "[PROXY]")
+
+          qualificationImageTwo &&
+          formdata.append("image2", qualificationImageTwo, "[PROXY]")
+          
+          qualificationImageThree &&
+          formdata.append("image3", qualificationImageThree, "[PROXY]")
+          
           
           regTherapist(formdata, {
             onMutate: () => {
@@ -101,18 +140,27 @@ const RegTherapistForm = () => {
 
               setLoading(false);
               setInput(false);
-            }
-          })
 
+          setFirstName('');
+          setLastName('');
           setEmail('');
-          setUsername('');
           setPassword('');
           setPostCode('');
           setProfileImg(null);
           setSelectCategoryID('');
-          formRef.current.reset();
           setSelectCategoryOptions('');
           setSelectedCategoryOptions('');
+          setQualificationImageOne(null);
+          setQualificationImageTwo(null);
+          setQualificationImageThree(null);
+          setAddress('');
+          setGender('');
+          setPhone('');
+          formRef.current.reset();
+            }
+          })
+
+
 
             
     }
@@ -151,7 +199,7 @@ const RegTherapistForm = () => {
         <div className="col-12 col-sm-12">
           <div className="card" style={{background:colorScheme.card_bg_color,color:colorScheme.card_txt_color, boxShadow:colorScheme.box_shadow_one}}>
             <div className="card-header">
-            Register Therapist Form
+            Register New Therapist
             </div>
             {/* /.card-header */}
             
@@ -176,71 +224,133 @@ const RegTherapistForm = () => {
 
                         </Select>
 
-                        {/* <select  className={selectCategory === ''&& input === true?"form-control border border-danger":"form-control"}
-                            style={{
-                              background: colorScheme.card_bg_color,
-                              color: colorScheme.card_txt_color,
-                              }}
-                              onChange={handleSelectChange}
-                              >
-                                {
-                                  category.length === 0 ?
-                                  <option value="">--- No Category Found ---</option>
-                                  :
-                                  category.map((options,index)=>{
-                                    return(
-                                      <option key={index} value={`${options.id},${options.title}`}>{options.title}</option>
-                                    )
-                                  })
-                                }
-                          
-
-                          </select> */}
+              
                     
                     
                     </div>
                     </div>
                     
                     <div className="col-lg-4 col-sm-12">
-                    <div className="form-group">
-                  <label htmlFor="exampleInputPassword6">Therapist Name*</label>
-                  <input type="text" name="Username" value={userName} className={userName === ''&& input === true?"form-control border border-danger":"form-control"} id="exampleInputPassword6"  onChange={(e)=>setUsername(e.target.value)} placeholder="Enter Username" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
-                </div>
+                        <div className="form-group">
+                      <label htmlFor="exampleInputPassword2">First Name*</label>
+                      <input type="text" name="firstName" value={firstName} className={firstName === ''&& input === true?"form-control border border-danger":"form-control"} id="exampleInputPassword2"  onChange={(e)=>setFirstName(e.target.value)} placeholder="Enter Firstname" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
+                    </div>
                     </div>
 
-
+                           
                     <div className="col-lg-4 col-sm-12">
-                    <div className="form-group">
-                        <label htmlFor="exampleInputEmail5">Email*</label>
-                        <input type="email" name="Income" value={email} className={email === ''&& input === true?"form-control border border-danger":"form-control"} id="exampleInputEmail5"  onChange={(e)=>setEmail(e.target.value)} placeholder="Enter Email"   style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}}/>
+                        <div className="form-group">
+                      <label htmlFor="exampleInputPassword3">Last Name*</label>
+                      <input type="text" name="lastName" value={lastName} className={lastName === ''&& input === true?"form-control border border-danger":"form-control"} id="exampleInputPassword3"  onChange={(e)=>setLastName(e.target.value)} placeholder="Enter Lastname" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
                     </div>
                     </div>
+
+
+
+
 
                 </div>
              
                 <div className="row">
 
+                
+                <div className="col-lg-4 col-sm-12">
+                    <div className="form-group">
+                        <label htmlFor="exampleInputEmail4">Email*</label>
+                        <input type="email" name="email" value={email} className={email === ''&& input === true?"form-control border border-danger":"form-control"} id="exampleInputEmail4"  onChange={(e)=>setEmail(e.target.value)} placeholder="Enter Email"   style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}}/>
+                    </div>
+                    </div>
 
                 <div className="col-lg-4 col-sm-12">
                     <div className="form-group">
-                  <label htmlFor="exampleInputPassword8">Password*</label>
-                  <input type="password" name="Price" value={password} className={password === ''&& input === true?"form-control border border-danger":"form-control"} id="exampleInputPassword8"  onChange={(e)=>setPassword(e.target.value)} placeholder="Enter Password" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
+                  <label htmlFor="exampleInputPassword5">Password*</label>
+                  <input type="password" name="password" value={password} className={password === ''&& input === true?"form-control border border-danger":"form-control"} id="exampleInputPassword5"  onChange={(e)=>setPassword(e.target.value)} placeholder="Enter Password" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
                 </div>
                 </div>
 
                 
+                <div className="col-lg-4 col-sm-12">
+                    <div className="form-group">
+                  <label htmlFor="exampleInputPassword6">Phone*</label>
+                  <input type="number" name="phone" value={phone} className={phone === ''&& input === true?"form-control border border-danger":"form-control"} id="exampleInputPassword6"  onChange={(e)=>setPhone(e.target.value)} placeholder="Enter Phone" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
+                </div>
+                </div>
+
+                </div>
+
+                <div className="row">
+                <div className="col-lg-12">
+                    <div className="form-group">
+                  <label htmlFor="exampleInputPassword7">Address*</label>
+                  <input type="text" name="address" value={address} className={address === ''&& input === true?"form-control border border-danger":"form-control"} id="exampleInputPassword7"  onChange={(e)=>setAddress(e.target.value)} placeholder="Enter Address" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
+                </div>
+                </div>
+
+                </div>
+
+
+
+
+                <div className="row">
+                <div className="col-lg-4 col-sm-12">
+                    <div className="form-group">
+                  <label htmlFor="exampleInputPassword8">Qualification 1*</label>
+                  <input type="file" name="qualificationImageOne" defaultValue={qualificationImageOne} className={(qualificationImageOne === '' || qualificationImageOne === null)&& input === true?"form-control border border-danger p-1":"form-control p-1"} id="exampleInputPassword8"  onChange={(e)=>setQualificationImageOne(e.target.files[0])} placeholder="Enter Profile Image" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
+                </div>
+                </div>
+
+                <div className="col-lg-4 col-sm-12">
+                    <div className="form-group">
+                  <label htmlFor="exampleInputPassword9">Qualification 2*</label>
+                  <input type="file" name="qualificationImageTwo" defaultValue={qualificationImageTwo} className={"form-control p-1"} id="exampleInputPassword9"  onChange={(e)=>setQualificationImageTwo(e.target.files[0])} placeholder="Enter Profile Image" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
+                </div>
+                </div>
+
+                <div className="col-lg-4 col-sm-12">
+                    <div className="form-group">
+                  <label htmlFor="exampleInputPassword10">Qualification 3*</label>
+                  <input type="file" name="qualificationImageThree" defaultValue={qualificationImageThree} className={"form-control p-1"} id="exampleInputPassword10"  onChange={(e)=>setQualificationImageThree(e.target.files[0])} placeholder="Enter Profile Image" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
+                </div>
+                </div>
+
+
+
+                </div>
+
+                <div className="row">
+                <div className="col-lg-4 col-sm-12">
+                    <div className="form-group">
+                  <label htmlFor="exampleInputPassword11">Profile Image*</label>
+                  <input type="file" name="image" defaultValue={profileImg} className={(profileImg === '' || profileImg === null)&& input === true?"form-control border border-danger p-1":"form-control p-1"} id="exampleInputPassword11"  onChange={(e)=>setProfileImg(e.target.files[0])} placeholder="Enter Profile Image" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
+                </div>
+                </div>
+
                 <div className="col-lg-4 col-sm-12 ">
-                    <div className="form-group">
-                  <label htmlFor="exampleInputPassword9">Profile Image</label>
-                  <input type="file" name="image" defaultValue={profileImg} className={profileImg === ''&& input === true?"form-control border border-danger p-1":"form-control p-1"} id="exampleInputPassword9"  onChange={(e)=>setProfileImg(e.target.files[0])} placeholder="Enter Profile Image" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
-                </div>
+                  <div className="form-group">
+                  <label htmlFor="exampleInputEmai12">Select Gender*</label>
+
+                  <select  className={gender === ''&& input === true?"form-control border border-danger":"form-control"}
+                            style={{
+                              background: colorScheme.card_bg_color,
+                              color: colorScheme.card_txt_color,
+                              }}
+                              value={gender}
+                              onChange={handleSelectChange}
+                              >
+                                  <option value="none">--------------------Select--------------------</option>
+                                  <option value="Male">Male</option>
+                                  <option value="Female">Female</option>
+                                  <option value="Other">Other</option>
+
+                          </select>
+                  </div>
                 </div>
 
                 
                 <div className="col-lg-4 col-sm-12">
                     <div className="form-group">
-                  <label htmlFor="exampleInputPassword8">Post Code*</label>
-                  <input type="text" name="postcode" value={postCode} className={postCode === ''&& input === true?"form-control border border-danger":"form-control"} id="exampleInputPassword8"  onChange={(e)=>setPostCode(e.target.value)} placeholder="Enter PostCode" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
+                  <label htmlFor="exampleInputPassword13">Post Code*</label>
+                  <input type="text" name="postcode"  className={postCode === ''&& input === true?"form-control border border-danger":"form-control"} id="exampleInputPassword13"  onChange={handlePostcodeInputChange} placeholder="Enter PostCode" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color , textTransform:"uppercase"}} />
                 </div>
                 </div>
 

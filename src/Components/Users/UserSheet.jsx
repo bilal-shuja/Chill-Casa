@@ -18,9 +18,12 @@ const UserSheet = () => {
     const[users , setUsers] = useState([]);
     const[userDate , setUserDate] = useState('');
     const[userPhone, setUserPhone] = useState('');
-    const[userName, setUsername] = useState('');
+    const[clientType, setClientType] = useState('');
     const[referalCode , setReferalCode] = useState('');
     const[roleID , setRoleID] = useState('');
+
+    const[pages, setPages] = useState(1);
+    const[count, setCount] = useState('');
 
     const[receID , setReceID] = useState('');
     const[hostMessage , setHostMessage] = useState('');
@@ -44,10 +47,22 @@ const UserSheet = () => {
       }
     }
 
+    const resultsPerPage = 10;
+    // function for getting page next:
+      const handleNextPage = () => {
+        setPages((prevPage) => prevPage + 1);
+      };
+    // function for getting previous page:
+      const handlePrevPage = () => {
+        setPages((prevPage) => Math.max(prevPage - 1, 1));
+      };
 
-    useQuery('all_users',userEndPoint.getAllUsers,{
+
+    useQuery(['all_users',pages],_=> userEndPoint.getAllUsers(pages),{
       onSuccess:(data)=>{
-        setUsers(data.data.Users)
+        setUsers(data.data.Users);
+        setCount(data.data.total_users)
+
      },
      onError: (err) => {
       return err;
@@ -55,6 +70,10 @@ const UserSheet = () => {
   }
   
    )
+
+   const totalResults = count|| 0;
+   const startResult = (pages - 1) * resultsPerPage + 1;
+   const endResult = Math.min(pages * resultsPerPage, totalResults);
 
 
   
@@ -127,16 +146,14 @@ const UserSheet = () => {
     }
 
 useEffect(() => {
-  // gettingUsers()
   SetLocalLogin()
 }, [])
  
 
 
- const filteredData = users.length > 0 && userDate !=='' &&  userPhone === '' ?  users.filter((items)=> items.Idate === userDate) 
- :     userDate ==='' &&  userPhone !== '' ? users.filter((items)=> items.phone === userPhone) 
- :        userDate ==='' &&  userPhone === '' && userName !==''  ? users.filter((items)=> items.username.toLowerCase() === userName)
- :        userDate ==='' &&  userPhone === '' && userName ==='' &&  referalCode !== '' ? users.filter((items)=>items.referal_code === referalCode)
+ const filteredData = users.length > 0 && userDate !=='' &&  userPhone === '' && clientType === ''?  users.filter((items)=> items.Idate === userDate) 
+ :     userPhone !== '' && userDate ==='' && clientType===''  ?  users.filter((items)=> items.phone_number === userPhone) 
+ :        userDate ==='' &&  userPhone === '' && clientType !==''  ? users.filter((items)=> items.type_of_client === clientType)
  : users 
 
 
@@ -169,17 +186,16 @@ function UserList ({items,index}){
 
     <tr key={index} style={{ color: colorScheme.card_txt_color }}>
     <td>{filteredData.length - index}</td>
-    <td>{items.id}</td>
     <td>{items.firstname}</td>
     <td >{items.lastname}</td>
     <td>{items.email}</td>
-    <td>{items.title}</td>
+    <td>{items.phone_number}</td>
     <td>{items.residence_address}</td>
     <td>{items.type_of_client}</td>
     <td>{items.date_of_birth}</td>
 
     
-    <td><Moment date={items.updated_at} format="YYYY/MM/DD"/></td>
+    <td>{items.Idate}</td>
     <td><Moment date={items.updated_at} format="hh:mm:ss"/></td>
     
   <td>
@@ -285,10 +301,10 @@ function UserList ({items,index}){
                     <h5>Users Sheet</h5>
                     <button className="btn btn-outline-info btn-sm" onClick={()=>{window.location.reload()}}>Reset Filters</button>
                         <div className="row p-2">
-                        <div className="col-sm-3">
+                        <div className="col-sm-4">
                           <label htmlFor="" className="form-label "> Search with Date:</label>
                               <div className="form-group">
-                                <input type="text" className="form-control" placeholder="Search by Date..."
+                                <input type="date" className="form-control" placeholder="Search by Date..."
                                 style={{
                                   background: colorScheme.card_bg_color,
                                   color: colorScheme.card_txt_color,
@@ -298,7 +314,7 @@ function UserList ({items,index}){
                           </div>
                       </div>
 
-                      <div className="col-sm-3">
+                      <div className="col-sm-4">
                         <label htmlFor="" className="form-label "> Search with Phone:</label>
                             <div className="form-group">
                               <input type="text" className="form-control" placeholder="Search by Phone..."
@@ -311,19 +327,21 @@ function UserList ({items,index}){
                         </div>
                     </div>
 
-                    <div className="col-sm-3">
-                        <label htmlFor="" className="form-label "> Search with Username:</label>
+                    <div className="col-sm-4">
+                        <label htmlFor="" className="form-label "> Search with Client Type:</label>
                             <div className="form-group">
-                              <input type="text" className="form-control" placeholder="Search by Username..."
+                              <input type="text" className="form-control" placeholder="Search by Client Type..."
                               style={{
                                 background: colorScheme.card_bg_color,
                                 color: colorScheme.card_txt_color,
                                 }}
-                                onChange={(e)=> setUsername(e.target.value)}
+                                onChange={(e)=> setClientType(e.target.value)}
                               />
                         </div>
                     </div>
 
+
+                      {/* 
                     <div className="col-sm-3">
                         <label htmlFor="" className="form-label "> Search with Refer Code:</label>
                             <div className="form-group">
@@ -335,7 +353,7 @@ function UserList ({items,index}){
                                 onChange={(e)=> setReferalCode(e.target.value)}
                               />
                         </div>
-                    </div>
+                    </div> */}
 
                     </div>
                   </div>
@@ -347,15 +365,15 @@ function UserList ({items,index}){
                           <thead className="text-center">
                             <tr>
                               <th>#</th>
-                              <th>ID</th>
-                              <th>Name</th>
+                              {/* <th>ID</th> */}
+                              <th>First Name</th>
                               <th>Last Name</th>
                               <th>Email</th>
-                              <th>Title</th>
-                              <th>Address</th>
+                              <th>Phone</th>
+                              <th>Home Address</th>
                               <th>Client Type</th>
                               <th>D-O-B</th> 
-                              <th>Date</th>
+                              <th>Joined Date</th>
                               <th>Time</th>
                               <th>Action</th>
                             </tr>
@@ -374,7 +392,7 @@ function UserList ({items,index}){
                                   }
                                   </tbody>
                                   </table>
-                                 
+                            
                                   :
 
                                 <div className="text-center">
@@ -382,9 +400,18 @@ function UserList ({items,index}){
                                 </div>
 
                         }
-                 
-                    </div>
-                  </div>
+
+                      <button className="btn btn-outline-light btn-sm" onClick={handlePrevPage} disabled={pages === 1}>
+                        <i className="fa-solid fa-arrow-left"></i>
+                        </button>
+                        &nbsp;&nbsp;
+                        <button className="btn btn-outline-light btn-sm" onClick={handleNextPage} disabled={totalResults <= 10}>
+                          <i className="fa-solid fa-arrow-right"></i>
+                        </button>
+                        <p >Showing {startResult} - {endResult} of {totalResults} results</p>
+                        
+                            </div>
+                          </div>
 
                 
                 {/*Query Modal Start  */}

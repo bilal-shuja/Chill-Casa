@@ -12,6 +12,9 @@
   "@brianmcallister/react-auto-scroll": "^1.1.0",
   
     
+  "@cyntler/react-doc-viewer": "^1.13.0",
+  
+    
   "@pusher/push-notifications-web": "^1.1.0",
   
     

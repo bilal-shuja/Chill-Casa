@@ -9,6 +9,7 @@ const PromoCodeForm = () => {
 
     const[loading, setLoading] = useState('');
     const[input , setInput] = useState('');
+    const[redeemedDiscount , setRedeemedDiscount] = useState('');
 
     const[promoCode , setPromoCode] = useState('');
     const[discount , setDiscount] = useState('');
@@ -61,7 +62,6 @@ const PromoCodeForm = () => {
       <div className="row mb-2">
         <div className="col-sm-6">
           <h1 style={{color:colorScheme.card_txt_color}}>Promo Code</h1>
-          <span>""</span>
         </div>
         <div className="col-sm-6">
           <ol className="breadcrumb float-sm-right">
@@ -117,10 +117,18 @@ const PromoCodeForm = () => {
                     </div>
             </div>
 
+            
+            <div className="col-lg-6 col-sm-12">
+                    <div className="form-group">
+                  <label htmlFor="exampleInputPassword1">Redeemed discounts*</label>
+                  <input type="number" name="redeemedDiscount" className={redeemedDiscount === ''&& input === true?"form-control border border-danger p-1":"form-control"} id="exampleInputPassword4"  onChange={(e)=>setRedeemedDiscount(e.target.value)} placeholder="Enter Redeemed discount" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
+                </div>
+                </div>
+
                 <div className="col-lg-6 col-sm-12">
                     <div className="form-group">
                   <label htmlFor="exampleInputPassword1">Expiry Date*</label>
-                  <input type="date" name="Price" className={expiryDate === ''&& input === true?"form-control border border-danger p-1":"form-control p-1"} id="exampleInputPassword4"  onChange={(e)=>setExpiryDate(e.target.value)}  style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
+                  <input type="date" name="Price" className={expiryDate === ''&& input === true?"form-control border border-danger p-1":"form-control p-1"} id="exampleInputPassword5"  onChange={(e)=>setExpiryDate(e.target.value)}  style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
                 </div>
                 </div>
                 

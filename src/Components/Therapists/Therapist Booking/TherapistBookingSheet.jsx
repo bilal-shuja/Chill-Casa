@@ -19,12 +19,15 @@ const TherapistBookingSheet = () => {
 
 
     // Hook's for search filter:
-    const[date , setDate] = useState('');
-    const[email , setEmail] = useState('');
-    const[userName, setUsername] = useState('');
+    const[timeFrom , setTimeFrom] = useState('');
+    const[timeTo , setTimeTo] = useState('');
+    const[dateForTimeslot ,setDateForTimeslot] = useState('')
+    const[postcode, setPostcode] = useState('');
+
+    // Hooks for pagination:
+    const[pages , setPages] = useState(1);
+    const[count , setCount] = useState('');
     
-    //Hook for getting date 
-    const[checkByDate, setCheckByDate] = useState('')
 
     // Hook for showing specific length in table:
     const[showLength, setShowLength] = useState(10);
@@ -38,12 +41,31 @@ const TherapistBookingSheet = () => {
 
 
 
+    const resultsPerPage = 10;
+    // function for getting page next:
+      const handleNextPage = () => {
+        setPages((prevPage) => prevPage + 1);
+      };
+    // function for getting previous page:
+      const handlePrevPage = () => {
+        setPages((prevPage) => Math.max(prevPage - 1, 1));
+      };
+    
+      const formtedDateAndPageObj = {
+        formattedDate,
+        pages
+      }
+
+      const totalResults = count|| 0;
+      const startResult = (pages - 1) * resultsPerPage + 1;
+      const endResult = Math.min(pages * resultsPerPage, totalResults);
+
     // function for getting therapists against current date:
-    useQuery(['all_available_therapits',formattedDate], _=> TherapistEndPoint.getAllAvailableTherapists(formattedDate),
+    useQuery(['all_available_therapits',formtedDateAndPageObj], _=> TherapistEndPoint.getAllAvailableTherapists(formtedDateAndPageObj),
     {
       refetchOnWindowFocus:false,
         onSuccess:(data)=>{
-            setAvailableTherapists(data.data.bookings)
+            setAvailableTherapists(data.data.timeslots)
        },
        onError: (err) => {
         return err;
@@ -53,13 +75,15 @@ const TherapistBookingSheet = () => {
 
 
     // function for getting therapist specific date: 
-    const  checkTherapistByDate = () => {
+    const  checkTherapistByDate = (e) => {
       const dateObj ={
-        date :checkByDate
+        date :e.target.value
       }
-            axios.post(`${process.env.REACT_APP_BASE_URL}fetchbookings_withdate`,dateObj)
+            axios.post(`${process.env.REACT_APP_BASE_URL}getTimeslotsByDate?page=${pages}`,dateObj)
          .then((res)=>{
-          setAvailableTherapists(res.data.bookings)
+          setAvailableTherapists(res.data.timeslots)
+          setCount(res.data.total_count)
+
           setCheckStatus(true)
          })
          .catch((err)=>{
@@ -68,6 +92,28 @@ const TherapistBookingSheet = () => {
     
     
     }
+
+    
+    // function for getting therapist specific date  & time-slot: 
+    const  checkTherapistByDateAndTime = () => {
+      const dateAndTimeObj ={
+        date : dateForTimeslot,
+        start_time:timeFrom,
+        end_time:timeTo,
+      }
+            axios.post(`${process.env.REACT_APP_BASE_URL}getTimeslotsByDateandTime?${pages}`,dateAndTimeObj)
+         .then((res)=>{
+          setAvailableTherapists(res.data.available_therapists)
+          setCount(res.data.total_count)
+          setCheckStatus(true)
+         })
+         .catch((err)=>{
+          return err
+         })
+    
+    
+    }
+    
     
 
     useEffect(() => {
@@ -81,9 +127,7 @@ const TherapistBookingSheet = () => {
     
 // Filter function against different inputs(e.g. date,email,username):
 
-const filterTherapistData =  availableTherapists && availableTherapists.length > 0 &&  date !=='' &&  email === ''  && userName === ''? availableTherapists.filter((items)=> items.Idate === date)
-:email !== "" &&  date ==='' && userName === "" ? availableTherapists.filter((items)=> items.email === email)
-:userName !== "" && date === "" && email === ""? availableTherapists.filter((items)=> items.therapist_name === userName)
+const filterTherapistData =  availableTherapists && availableTherapists.length > 0 && postcode !== "" ? availableTherapists.filter((items)=> items.postcode === postcode)
 : availableTherapists
 
   return (
@@ -111,85 +155,88 @@ const filterTherapistData =  availableTherapists && availableTherapists.length >
             
           <div className="container-fluid">
             <div className="row">
-                       {/* <div className="col-lg-3 ">
-                          <div className="form-group">
-                                  <input type="date"  className="form-control input-group-sm" id="exampleInputEmail1" placeholder="Enter Title" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} onChange={(e)=>setCheckByDate(e.target.value)}/>
-                          </div>
-                          <div className="col-lg-3">
-                          <button onClick={()=> approveDepoByDate()} className="btn btn-sm btn-outline-info">
-                            Check 
-                          </button>
-                          </div>
-                  
-                          </div> */}
               <div className="col-lg-12">
 
                 <div className="card" style={{background: colorScheme.card_bg_color,color: colorScheme.card_txt_color,boxShadow: colorScheme.box_shadow_one,}}>
                   
                   <div className="card-header">        
                     <h5>Therapists Sheet</h5>
-                    <div className="row">
-                        <div className="col-lg-3 col-sm-3">
-                        <div className="form-group">
-                            <input type="date"  className="form-control input-group-sm" id="exampleInputEmail1"  style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} onChange={(e)=>setCheckByDate(e.target.value)}/>
-                        </div>
-                        </div>
-
-                        <div className="col-lg-3 mt-1">
-                          <button onClick={()=> checkTherapistByDate()} className="btn btn-sm  btn-outline-info">
-                            Check
-                          </button>
-                          &nbsp;&nbsp;
-                          <button className="btn btn-outline-info btn-sm" onClick={()=>{window.location.reload()}}>Reset Filters</button>
-                          </div>
-                    </div>
-                 
                         
-                        <div className="row p-2">
+                  <div className="row">
+                      <div className="col-sm-6">
+                        <label htmlFor="" className="form-label">Search with Date:</label>&nbsp;&nbsp;&nbsp;
 
-
-                      {/* <div className="col-sm-6">
-                        <label htmlFor="" className="form-label">Search with Email:</label>
+                          
                             <div className="form-group">
-                              <input type="text" className="form-control" placeholder="Search by Email..."
-                              style={{
-                                background: colorScheme.card_bg_color,
-                                color: colorScheme.card_txt_color,
-                                }}
-                                onChange={(e)=> setEmail(e.target.value)}
-                              />
-                        </div>
-                    </div>
-                  */}
-                    <div className="col-sm-4">
-                        <label htmlFor="" className="form-label"> Search with Username:</label>
-                            <div className="form-group">
-                              <input type="text" className="form-control" placeholder="Search by Username..."
-                              style={{
-                                background: colorScheme.card_bg_color,
-                                color: colorScheme.card_txt_color,
-                                }}
-                                onChange={(e)=> setUsername(e.target.value)}
-                              />
-                        </div>
+                            <input type="date"  className="form-control input-group-sm" id="exampleInputEmail1"  style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} onChange={(e)=>checkTherapistByDate(e)}/>
+                            </div>
                     </div>
 
-                    <div className="col-sm-4">
-                          <label htmlFor="" className="form-label">Search with Date:</label>
+                    
+                    <div className="col-sm-6">
+                          <label htmlFor="" className="form-label">Search with Postcode/Region:</label>
                               <div className="form-group">
-                                <input type="text" className="form-control" placeholder="Search by Date..."
+                                <input type="text" className="form-control" placeholder="Postcode/Region..."
                                 style={{
                                   background: colorScheme.card_bg_color,
                                   color: colorScheme.card_txt_color,
                                   }}
-                                  onChange={(e)=> setDate(e.target.value)}
+                                  onChange={(e)=> setPostcode(e.target.value)}
                                 />
                           </div>
                       </div>
 
                     </div>
 
-         
+
+                    <div className="row ">
+                    <div className="col-sm-3">
+                      
+                        <label htmlFor="" className="form-label">Hours/Slots(FROM):</label>
+                            <div className="form-group">
+                              <input type="text" className="form-control" placeholder="Enter from..."
+                              style={{
+                                background: colorScheme.card_bg_color,
+                                color: colorScheme.card_txt_color,
+                                }}
+                                onChange={(e)=> setTimeFrom(e.target.value)}
+                              />
+                        </div> 
+                    </div>
+
+                    <div className="col-sm-3">
+                        <label htmlFor="" className="form-label"> Hours/Slots(TO):</label>
+                            <div className="form-group">
+                              <input type="text" className="form-control" placeholder="Enter To..."
+                              style={{
+                                background: colorScheme.card_bg_color,
+                                color: colorScheme.card_txt_color,
+                                }}
+                                onChange={(e)=> setTimeTo(e.target.value)}
+                              />
+                        </div>
+                        
+                    </div>
+
+                    <div className="col-sm-3">
+                      
+                      <label htmlFor="" className="form-label">Date for timeslots:</label>
+                          <div className="form-group">
+                            <input type="date" className="form-control" 
+                            style={{
+                              background: colorScheme.card_bg_color,
+                              color: colorScheme.card_txt_color,
+                              }}
+                              onChange={(e)=> setDateForTimeslot(e.target.value)}
+                            />
+                      </div> 
+                  </div>
+                  <div className="col-sm-3 d-flex align-self-center mt-3">
+                  <button onClick={checkTherapistByDateAndTime} className="btn btn-outline-info">Check by slots</button>
+                  
+                  </div>
+                  </div>
+
                     
                   </div>
                   <div className="card-body table-responsive p-2">
@@ -203,15 +250,17 @@ const filterTherapistData =  availableTherapists && availableTherapists.length >
                     <thead className="text-center">
                       <tr>
                         <th>#</th>
-                        <th>Therapist Name</th>
-                        <th>Therapist Category</th>
-                        <th>Consumer Name</th>
+                        <th>First Name</th>
+                        <th>last Name</th>
+                        <th>Gender</th>
+                        <th>Contact</th>
+                        <th>Therapist Services</th>
+                        <th>Profile</th>
                         <th>Address</th>
-                        <th>Price</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Duration</th>
+                        <th>Region/Postcode</th>
+                        <th>Selected Date</th>
                         <th>Status</th>
+                        <th>Rating</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
@@ -222,9 +271,22 @@ const filterTherapistData =  availableTherapists && availableTherapists.length >
                       return(
                           <tr key={index} style={{ color: colorScheme.card_txt_color }}>
                           <td>{filterTherapistData.length - index}</td>
-                          <td>{items.therapist_name}</td>
-                          <td>{items.category_title}</td>
-                          <td>{items.username}</td>
+                          <td>{items.firstname}</td>
+                          <td>{items.lastname}</td>
+                          <td>{items.gender}</td>
+                          <td>{items.phone_number}</td>
+                          <td>{items.category_name.map((category)=>{
+                            return(
+                              <li style={{listStyle:"none"}}>{category}</li>
+                            )
+                          })}</td>
+                          <td>
+                          <img
+                              src={`${process.env.REACT_APP_IMG_URL}${items.image}`}
+                              alt=""
+                              width={50}
+                            />
+                          </td>
                           <td>
                           <ReadMoreReact
                                 text={
@@ -236,11 +298,29 @@ const filterTherapistData =  availableTherapists && availableTherapists.length >
                                 readMoreText="...Read More"
                               />                            
                           </td>
-                          <td>{items.price}</td>
-                          <td>{items.date}</td>
-                          <td>{items.time}</td>
-                          <td>{items.duration}</td>
-                          <td>{items.status}</td>
+                          <td>{items.postcode.map((postcode)=>{
+                            return(
+                              <li style={{listStyleType:"none"}}>{postcode}</li>
+                            )
+                          })}</td>
+                          <td>{items.Idate}</td>
+                          {
+                            items.status === "ACTIVE"?
+                            <td className="text-success">
+                            {
+                              items.status
+                            }
+                            </td>
+                            :
+                            <td className="text-warning">
+                            {
+                              items.status
+                            }
+                            </td>
+
+                          }
+
+                          <td>{items.rating}</td>
 
                           <td>
                             .....
@@ -269,10 +349,20 @@ const filterTherapistData =  availableTherapists && availableTherapists.length >
                 
                     }
 
-                    {remainingThreapistCount && remainingThreapistCount.length > 0 && (
+                  <button className="btn btn-outline-light btn-sm" onClick={handlePrevPage} disabled={pages === 1}>
+                <i className="fa-solid fa-arrow-left"></i>
+                </button>
+                &nbsp;&nbsp;
+                <button className="btn btn-outline-light btn-sm" onClick={handleNextPage} disabled={totalResults <= 10}>
+                  <i className="fa-solid fa-arrow-right"></i>
+                </button>
+                <p >Showing {startResult} - {endResult} of {totalResults} results</p>
+
+
+                    {/* {remainingThreapistCount && remainingThreapistCount.length > 0 && (
                       // only display the "Show More" button if there are more rows to show
                       <button  className="btn btn-outline-info" onClick={()=> setShowLength(showLength+30)}>Show More</button>
-                    )}
+                    )} */}
                   </div>
                 </div>
 

@@ -4,7 +4,6 @@ import "react-toastify/dist/ReactToastify.css";
 import colorScheme from "../Colors/Styles.js";
 import { toast } from "react-toastify";
 import Filter from '../Filters/Filter';
-// import {Modal} from 'pretty-modal';
 import Modal from 'react-modal';
 
 import Moment from 'react-moment';
@@ -25,12 +24,18 @@ const UserTimelineModal = ({ID,isShow,onHide}) => {
     const[userTeamFive , setUserTeamFive] = useState([]);
     const[userTeamSix , setUserTeamSix] = useState([]);
 
-
+    
     const[getReferral, setReferral] = useState([])
     const[userTotal , setUserTotal] = useState('');
     const[roleID , setRoleID] = useState('');
-
+    
     const[display , setDisplay] = useState(0);
+    
+    const[therapisTakenBookingCount , setTherapisTakenBookingCount] = useState('');
+    const[therapistRejectedBookingCount , setTherapistRejectedBookingCount] = useState('')
+
+    const[therapistBookings , setTherapistBookings] = useState([])
+
     
     function handleDisplay(val){
 
@@ -38,6 +43,49 @@ const UserTimelineModal = ({ID,isShow,onHide}) => {
             setDisplay(val)
           }, 1000);
     }
+
+
+    function gettingTakenTherapistBookingCount(){
+      const bookingStatusObj = {
+        status: "taken",
+        therapist_id:ID
+      }
+      axios.post(`${process.env.REACT_APP_BASE_URL}getBookingCountByStatus`,bookingStatusObj)
+      .then((res)=>{
+        setTherapistRejectedBookingCount(res.data)
+      })
+      .catch((err)=>{
+        return err;
+      })
+    }
+
+    function gettingRejectedTherapistBookingCount(){
+      const bookingStatusObj = {
+        status: "rejected",
+        therapist_id:ID
+      }
+      axios.post(`${process.env.REACT_APP_BASE_URL}getBookingCountByStatus`,bookingStatusObj)
+      .then((res)=>{
+        setTherapisTakenBookingCount(res.data)
+      })
+      .catch((err)=>{
+        return err;
+      })
+    }
+
+    function gettingTherapistBookings(){
+      const bookingObj = {
+        therapist_id:ID
+      }
+      axios.post(`${process.env.REACT_APP_BASE_URL}getBookingsByTherapistId`,bookingObj)
+      .then((res)=>{
+        setTherapistBookings(res.data.Bookings)
+      })
+      .catch((err)=>{
+        return err;
+      })
+    }
+
 
 
     
@@ -131,18 +179,6 @@ const UserTimelineModal = ({ID,isShow,onHide}) => {
     })
     }
 
-    // function gettingReferralTotal(){
-    //   const userObj = {
-    //     user_id:ID
-    // }
-    // axios.post(`${process.env.REACT_APP_BASE_URL}fetch_referral`,userObj)
-    // .then((res)=>{
-    //   setReferral(res.data.data)
-    // })
-    // .catch((error)=>{
-    //    return null
-    // })
-    // }
 
     
     
@@ -154,8 +190,11 @@ const UserTimelineModal = ({ID,isShow,onHide}) => {
         getWithdrawalInfo()
         getAllUsers()
         getUserTotals()
-        // gettingReferralTotal()
         SetLocalLogin()
+
+        gettingTherapistBookings()
+        gettingTakenTherapistBookingCount()
+        gettingRejectedTherapistBookingCount()
     }, [])
     
   return (
@@ -165,18 +204,7 @@ const UserTimelineModal = ({ID,isShow,onHide}) => {
     <div className="container-fluid">
       <div className="row mb-2">
         <div className="col-sm-6">
-          <h1>Timeline</h1>
-          {
-            getReferral.map((items)=>{
-              return(
-                <div className="d-flex mt-3">
-                <h4 className="text-bold">Referred by:&nbsp;&nbsp;{items.username}
-                &nbsp;&nbsp;({items.referal_code})
-                </h4>
-                </div>
-              )
-            })
-          }
+          <h1>Therapist Timeline</h1>
         </div>  
         <div className="col-sm-6">
           <ol className="breadcrumb float-sm-right">
@@ -263,42 +291,20 @@ const UserTimelineModal = ({ID,isShow,onHide}) => {
               <span className="btn btn-outline-primary btn-sm float-right" onClick={()=>handleDisplay(0)}><i className="fa-solid fa-arrow-up"></i></span>
 
               }
-                <h3 className="timeline-header text-white">Total Cash Flow</h3>
+                <h3 className="timeline-header text-white">Total Orders</h3>
               {
                  display !== 2 ? null:
                 <div className="timeline-body">
                  <div className="row">
               
-                      <div className="col-lg-3 p-2">
-                      <li style={{listStyle:"none"}}>Total Balance:&nbsp;<b>{Number(userTotal.Total_balance).toFixed(2)}</b> </li>
+                      <div className="col-lg-6 p-2">
+                      <li style={{listStyle:"none"}}>Total taken orders:&nbsp;<b>{therapisTakenBookingCount.count}</b> </li>
                       </div>
 
-                      <div className="col-lg-3 p-2">
-                      <li style={{listStyle:"none"}}>Total Deposit:&nbsp;<b>{userTotal.Total_deposit}</b> </li>
+                      <div className="col-lg-6 p-2">
+                      <li style={{listStyle:"none"}}>Total Rejected orders:&nbsp;<b>{therapistRejectedBookingCount.count}</b> </li>
                       </div>
-
-                      <div className="col-lg-3 p-2">
-                      <li style={{listStyle:"none"}}>Total Withdrawal:&nbsp;<b>{userTotal.Total_withdrawl}</b> </li>
-                      </div>
-                      
-                      <div className="col-lg-3 p-2">
-                      <li style={{listStyle:"none"}}> Total Income:&nbsp;<b>{Number(userTotal.Total_income).toFixed(2)}</b> </li>
-                      </div>
-
-                      <div className="col-lg-3 p-2">
-                      <li style={{listStyle:"none"}}>Total Investment:&nbsp;<b>{userTotal.Total_investment}</b> </li>
-                      </div>
-                      
-                      <div className="col-lg-3 p-2">
-                      <li style={{listStyle:"none"}}>Level:&nbsp;<b>{userTotal.my_level}</b> </li>
-                      </div>
-                      
-                      <div className="col-lg-3 p-2">
-                      <li style={{listStyle:"none"}}>Referral Code:&nbsp;<b>{userTotal.my_code}</b> </li>
-                      </div>
-
-               
-                      </div>
+                    </div>
         
           
                 </div>
@@ -322,27 +328,32 @@ const UserTimelineModal = ({ID,isShow,onHide}) => {
               <span className="btn btn-outline-primary btn-sm float-right" onClick={()=>handleDisplay(0)}><i className="fa-solid fa-arrow-up"></i></span>
 
               }
-                <h3 className="timeline-header text-white">Deposite Info</h3>
+                <h3 className="timeline-header text-white">Booking Information</h3>
                 {
                 display !== 3 ? null:
                 <div className="timeline-body">
           
                 {
-                  userDepo.length !== 0 ?
+                  therapistBookings && therapistBookings.length > 0 ?
                  <div className="row">
                   {
-                   userDepo.map((items,index)=>{
+                   therapistBookings.map((items,index)=>{
                     return(
-                      <div key={index+1} className="col-lg-4">
-                      <li className="mb-3" style={{listStyle:"none"}}>Deposit No:&nbsp;<b>{index+1}</b></li>
-                      <li>Account Title:&nbsp;<b>{items.account_title}</b> </li>
-                      <li>Account No:&nbsp;<b>{items.account_no}</b> </li>
-                      <li>Account Type:&nbsp;<b>{items.account_type}</b> </li>
+                      <div key={index+1} className="col-lg-6">
+                      <li className="mb-3" style={{listStyle:"none"}}>Booking No:&nbsp;<b>{index+1}</b></li>
+                      <li>Therapist Name:&nbsp;<b>{items.therapist_name}</b> </li>
+                      <li>Categories: &nbsp;<b>{items.category_name.map((category)=>{
+                        return(
+                            <li>{category}</li>
+                        )
+                      })}</b> </li>
+                      <li>Address: &nbsp;&nbsp; {items.address}</li>
+                      <li>Price:&nbsp;<b>{items.price}</b> </li>
        
-                      <li>Account Sub-Type:&nbsp;<b>{items.account_subtype}</b> </li>
-                      <li>Amount:&nbsp;<b>{items.amount}</b> </li>
+                      <li>Time:&nbsp;<b>{items.time}</b> </li>
+                      <li>Duration:&nbsp;<b>{items.duration}</b> </li>
                       <li>Status:&nbsp;<b>{items.status}</b> </li>
-                      <li style={{listStyle:"none"}}> <i className="fas fa-calendar-days"/>&nbsp;&nbsp;&nbsp;<b>{items.Idate}</b></li> 
+                      <li style={{listStyle:"none"}}> <i className="fas fa-calendar-days"/>&nbsp;&nbsp;&nbsp;<b>{items.date}</b></li> 
 
 
                       </div>
@@ -351,7 +362,7 @@ const UserTimelineModal = ({ID,isShow,onHide}) => {
               }
                  </div>
                  :
-                 <h3 className="text-center">No Deposits!</h3>
+                 <h3 className="text-center">No Bookings Found!</h3>
                }
 
                 </div>

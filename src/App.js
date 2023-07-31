@@ -17,7 +17,10 @@ import Register from './Components/Auth/Register.jsx';
 
 
 // Therapists Section:
-import TherapistCategoryForm from './Components/Therapists/TherapistCategoryForm.jsx';
+import TherapistCategoryForm from './Components/Therapists/Therapist Services/TherapistCategoryForm.jsx';
+import TherapistCategorySheet from './Components/Therapists/Therapist Services/TherapistCategorySheet.jsx';
+import UpdateTherapistCategory from './Components/Therapists/Therapist Services/UpdateTherapistCategory.jsx'
+
 import RegTherapistForm from './Components/Therapists/RegTherapistForm.jsx';
 import UpdateTherapist from './Components/Therapists/UpdateTherapist.jsx';
 import TherapistSheet from './Components/Therapists/TherapistSheet.jsx';
@@ -167,9 +170,13 @@ function App() {
            <Route path="/BlogSheet" element={<BlogSheet/>}/>
 
 
+         
+           <Route path="/TherapistCategoryForm" element={<TherapistCategoryForm/>}/>
+           <Route path="/TherapistCategorySheet" element={<TherapistCategorySheet/>}/>
+           <Route path="/UpdateTherapistCategory" element={<UpdateTherapistCategory/>}/>
+
            <Route path="/RegTherapistForm" element={<RegTherapistForm/>}/>
            <Route path="/TherapistSheet" element={<TherapistSheet/>}/>
-           <Route path="/TherapistCategoryForm" element={<TherapistCategoryForm/>}/>
            <Route path="/UpdateTherapist" element={<UpdateTherapist/>}/>
            <Route path="/AvailableTherapistSheet" element={<AvailableTherapistSheet/>}/>
           
@@ -254,7 +261,7 @@ function App() {
 }
    
     </div>
-    <ReactQueryDevtools initialIsOpen = {false} position='bottom-right'/>
+    {/* <ReactQueryDevtools initialIsOpen = {false} position='bottom-right'/> */}
 </QueryClientProvider>
   );
 }

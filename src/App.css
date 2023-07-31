@@ -238,11 +238,11 @@ input:checked + .slider .off
   margin-bottom: 1.5em;
 }
 :root {
-  --pretty-modal-modal-container-background-color:#161d31 ;
+  --pretty-modal-modal-container-background-color:#272c32 ;
   --pretty-modal-modal-container-transform: translateX(-125rem);
   --pretty-modal-modal-container-border-radius: 0.8em;
   --pretty-modal-backdrop-backdrop-filter: blur(0em);
-  --pretty-modal-backdrop-background-color: rgba(21, 20, 20, 0.5);
+  --pretty-modal-backdrop-background-color: rgba(5, 4, 4, 0.5);
 
   --pretty-modal-modal-container-padding: 0px;
   --pretty-modal-backdrop-padding: 0px 0;
