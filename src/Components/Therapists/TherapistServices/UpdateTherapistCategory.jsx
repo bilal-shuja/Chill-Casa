@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect } from "react";
 import colorScheme from "../../Colors/Styles.js";
 import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
-import { useQuery } from "react-query";
 import axios from 'axios';
 
 const UpdateTherapistCategory = () => {
@@ -60,9 +59,7 @@ function updateTherapistCategorySubmit(e){
         formdata.append("duration", serviceDuration);
         formdata.append("percentage", percentage);
 
-        updateTherapistCategoryForm(
-
-        {formdata,ID}, 
+        updateTherapistCategoryForm({formdata,ID}, 
         {
             onMutate: () => {
               setLoading(true);

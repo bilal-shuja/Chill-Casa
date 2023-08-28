@@ -197,7 +197,7 @@ const MemProfile = () => {
                 <div className="col-sm-3">
               <i className="fa-solid fa-file-signature fa-2x"></i>
                 </div>
-                <h4>{`Your referral code is PHRNEL`}</h4>
+                <h4>{`Your Postcode is ABC123`}</h4>
                   
               </div>
           </div>

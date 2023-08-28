@@ -17,6 +17,11 @@ function getAllAvailableTherapists(formattedDate){
 
 }
 
+function getTherapistByID(ID){
+  return axios.post(`${process.env.REACT_APP_BASE_URL}fetchtherapistwithid/${ID}`,)
+
+}
+
 
 const  getAvailableTherapistsByDate = async (checkByDate) => {
   const dateObj ={
@@ -30,12 +35,13 @@ const  getAvailableTherapistsByDate = async (checkByDate) => {
 
 
 function regTherapist(formdata){
+  console.log(formdata)
     axios.post(`${process.env.REACT_APP_BASE_URL}post_therapist`, formdata)
     .then((res)=>{
-      console.log(res)
       if(res.data.status === '200'){
         toast.info("Therapist Registered", {theme:"dark"})
       }
+      console.log(res)
    
     })
   .catch((error)=>{
@@ -72,6 +78,18 @@ const statusObj ={
 
 }
 
+function postAdminComments(adminCommentObj){
+  axios.post(`${process.env.REACT_APP_BASE_URL}post_admin_note`,adminCommentObj)
+  .then((res)=>{
+
+      toast.info("Comment Submitted",{theme:"dark"})
+
+  })
+  .catch((error)=>{
+    toast.warn("Something went wrong" , {theme:"dark"})
+  })
+}
+
 
 
 
@@ -87,15 +105,20 @@ const useTherapistStatus = ()=>{
   return useMutation(chnagetherapistStatus)
 }
 
+const useAdminComment = ()=>{
+  return useMutation(postAdminComments)
+}
 
 
 const TherapistEndPoint = {
   getAllTherapists,
+  getTherapistByID,
   getAllAvailableTherapists,
   getAvailableTherapistsByDate,
   useRegTherapist,
   useAvailableTherapistsByDate,
-  useTherapistStatus
+  useTherapistStatus,
+  useAdminComment
 }
 
 export default TherapistEndPoint;

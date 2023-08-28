@@ -81,7 +81,7 @@ const Sidebar = () => {
                     <a href="#" className="nav-link">
                       <i className="nav-icon fas fa-user mr-2" />
                       <p>
-                        Users
+                        Client
                         <i className="right fas fa-angle-left" />
                       </p>
                     </a>
@@ -89,16 +89,24 @@ const Sidebar = () => {
                       <li className="nav-item">
                         <Link to="/UserSheet" className="nav-link ">
                           <i className="far fa-circle nav-icon" />
-                          <p>Users Sheet</p>
+                          <p>Clients List</p>
                         </Link>
                       </li>
-                          {/* 
+
                       <li className="nav-item">
-                        <Link to="/SuspendedUsers" className="nav-link ">
+                        <Link to="/UserBookingSheet" className="nav-link ">
                           <i className="far fa-circle nav-icon" />
-                          <p>Suspended Users</p>
+                          <p>Booking Sheet</p>
+                        </Link>
+                      </li>
+                          
+                      {/* <li className="nav-item">
+                        <Link to="/AdminCommentSheet" className="nav-link ">
+                          <i className="far fa-circle nav-icon" />
+                          <p>Comment Sheet</p>
                         </Link>
                       </li> */}
+                      
                     </ul>
                   </li>
                 {/* // ) : null} */}
@@ -120,23 +128,9 @@ const Sidebar = () => {
                     </li>
 
                     <li className="nav-item">
-                        <Link to="/TherapistCategoryForm" className="nav-link ">
-                          <i className="far fa-circle nav-icon" />
-                          <p>Services Form</p>
-                        </Link>
-                    </li>
-
-                    <li className="nav-item">
-                        <Link to="/TherapistCategorySheet" className="nav-link ">
-                          <i className="far fa-circle nav-icon" />
-                          <p>Services Sheet</p>
-                        </Link>
-                    </li>
-
-                    <li className="nav-item">
                         <Link to="/RegTherapistForm" className="nav-link ">
                           <i className="far fa-circle nav-icon" />
-                          <p>Therapist Form</p>
+                          <p>New Therapist</p>
                         </Link>
                       </li>
 
@@ -145,7 +139,7 @@ const Sidebar = () => {
                     <li className="nav-item">
                         <Link to="/TherapistSheet" className="nav-link ">
                           <i className="far fa-circle nav-icon" />
-                          <p>Therapist Sheet</p>
+                          <p>Therapist List</p>
                         </Link>
                       </li>
 
@@ -155,6 +149,7 @@ const Sidebar = () => {
                           <p>Available Therapist</p>
                         </Link>
                       </li>
+
                       
                     {roleID === "1" || roleID === "6" ? (
                       null
@@ -192,31 +187,31 @@ const Sidebar = () => {
                 </li>
 
 
-                {/* {roleID === "3" && roleID === "4" ? null : (
+              
                   <li className="nav-item menu treeview">
                     <a href="#" className="nav-link">
                       <i className="nav-icon fas fa-box mr-2" />
                       <p>
-                        Packages
+                        Services
                         <i className="right fas fa-angle-left" />
                       </p>
                     </a>
                     <ul className="nav nav-treeview">
-                      <li className="nav-item">
-                        <Link to="/AddPackageForm" className="nav-link ">
+                    <li className="nav-item">
+                        <Link to="/TherapistCategoryForm" className="nav-link ">
                           <i className="far fa-circle nav-icon" />
-                          <p>Add Package</p>
+                          <p>Services Form</p>
                         </Link>
-                      </li>
-                      <li className="nav-item">
-                        <Link to="/PackageSheet" className="nav-link">
+                    </li>
+
+                    <li className="nav-item">
+                        <Link to="/TherapistCategorySheet" className="nav-link ">
                           <i className="far fa-circle nav-icon" />
-                          <p>Packages Sheet</p>
+                          <p>Massages Sheet</p>
                         </Link>
-                      </li>
+                    </li>
                     </ul>
                   </li>
-                )} */}
 
 
               {/* <li className="nav-item menu treeview">
@@ -433,24 +428,40 @@ const Sidebar = () => {
                   <a href="#" className="nav-link   ">
                     <i className="nav-icon  fa-solid fa-chart-column"></i>
                     <p>
-                      Statistics
+                      Reports
                       <i className="right fas fa-angle-left" />
                     </p>
                   </a>
                   <ul className="nav nav-treeview">
-                    <li className="nav-item">
-                      <Link to="/DailyChart" className="nav-link ">
+
+                  <li className="nav-item">
+                      <Link to="/ExpenseForm" className="nav-link ">
                         <i className="far fa-circle nav-icon" />
-                        <p>Daily Chart</p>
+                        <p>Expense Form</p>
                       </Link>
                     </li>
 
                     <li className="nav-item">
-                      <Link to="/RevenueChart" className="nav-link ">
+                      <Link to="/ChillCasaExpenseChart" className="nav-link ">
                         <i className="far fa-circle nav-icon" />
-                        <p>Revenue Chart</p>
+                        <p>ChillCasa Expense Chart</p>
                       </Link>
                     </li>
+
+                    <li className="nav-item">
+                      <Link to="/ChillCaseRevenueChart" className="nav-link ">
+                        <i className="far fa-circle nav-icon" />
+                        <p>Chill-Case Revenue Chart</p>
+                      </Link>
+                    </li>
+
+                    <li className="nav-item">
+                      <Link to="/TherapistRevenueChart" className="nav-link ">
+                        <i className="far fa-circle nav-icon" />
+                        <p>Therapist Revenue Chart</p>
+                      </Link>
+                    </li>
+
                   </ul>
                 </li> 
 
@@ -626,6 +637,8 @@ const Sidebar = () => {
                     <p>Help Center</p>
                   </Link>
                 </li>
+
+                
               </ul>
             </nav>
             {/* /.sidebar-menu */}

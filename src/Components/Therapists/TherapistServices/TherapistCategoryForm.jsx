@@ -134,7 +134,7 @@ const TherapistCategoryForm = () => {
                                 }
                                 id="exampleInputPassword6"
                                 onChange={(e) => setServiceName(e.target.value)}
-                                placeholder="Enter Username"
+                                placeholder="Enter Service Name"
                                 style={{
                                   background: colorScheme.card_bg_color,
                                   color: colorScheme.card_txt_color,
@@ -197,7 +197,7 @@ const TherapistCategoryForm = () => {
                           <div className="col-lg-6 col-sm-12">
                             <div className="form-group">
                               <label htmlFor="exampleInputPassword9">
-                                Percentage %*
+                              Therapist Percentage %*
                               </label>
                               <input
                                 type="number"

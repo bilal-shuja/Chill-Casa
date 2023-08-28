@@ -1,12 +1,10 @@
 import therapistCategoryEndPoint from '../../Api/TherapistCateEndPoint.js';
-import React,{useState , useEffect} from 'react';
 import colorScheme from '../../Colors/Styles.js';
 import "react-toastify/dist/ReactToastify.css";
 import ReadMoreReact from 'read-more-react';
-import { toast } from "react-toastify";
 import {Link} from 'react-router-dom';
 import {useQuery} from 'react-query';
-import axios from "axios";
+import React,{useState} from 'react';
 
 
 const TherapistCategorySheet = () => {
@@ -52,7 +50,7 @@ const TherapistCategorySheet = () => {
             <div className="row mb-2">
               <div className="col-sm-6">
                 <h1 style={{ color: colorScheme.card_txt_color }}>
-                  Services
+                Massages
                 </h1>
               </div>
             </div>
@@ -66,7 +64,7 @@ const TherapistCategorySheet = () => {
 
                 <div className="card" style={{background: colorScheme.card_bg_color,color: colorScheme.card_txt_color,boxShadow: colorScheme.box_shadow_one,}}>
                   <div className="card-header">
-                    <h5>Services Sheet</h5>   
+                    <h5>Massages Sheet</h5>   
                   </div>
                   <div className="card-body table-responsive p-2">
         {
@@ -75,13 +73,13 @@ const TherapistCategorySheet = () => {
           <thead className="text-center">
             <tr>
               <th>#</th>
-              <th>Service Name</th>
+              <th>Types of Services</th>
               <th>Price</th>
               <th>Duration</th>
               <th>Percentage</th>
-              <th>End date</th>
               <th>Description</th>
-              <th>Date</th>
+              <th>Start Date</th>
+              <th>End date</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -96,18 +94,18 @@ const TherapistCategorySheet = () => {
                   <td>{items.service_price}</td>
                    <td>{items.duration}</td>
                    <td>{items.percentage}</td>
-                  <td>{items.end_date}</td>
                   <td>
                   <ReadMoreReact
                                 text={
-                                 items.description
+                                  items.description
                                 }
                                 min={10}
                                 ideal={35}
                                 max={90}
                                 readMoreText="...Read More"
-                  />                               
+                                />                               
                   </td>
+                  <td>{items.end_date}</td>
                   <td>{items.Idate}</td>
 
                   <td>

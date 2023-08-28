@@ -23,21 +23,14 @@ function gettingOwnReplyOnTicket(ID){
 function replyingOnTicket(sendingTicketObj){
  const replyOnTick =  axios.post(`${process.env.REACT_APP_BASE_URL}post_reply`,sendingTicketObj)
     .then((res)=>{
-    //   setLoading(false)
       toast.info("Message Send!",{theme:"dark"})
-    //   setTicketReply('')
-        // gettingTicketData()
-      // geneNotification()
     })
     .catch((error)=>{
       if(error.status === 401){
-        // setLoading(false)
         toast.warn(error.data.message,{theme:"dark"})
       }
       else{
         toast.warn("Something went wrong",{theme:"dark"})
-        // setLoading(false)
-
       }
     })
 

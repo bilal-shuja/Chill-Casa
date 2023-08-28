@@ -1,85 +1,61 @@
-import therapistCategoryEndPoint from '../Api/TherapistCateEndPoint.js';
-import {Link,useLocation , useNavigate} from 'react-router-dom';
-import TherapistEndPoint from '../Api/TherapistEndPoints.js';
+import {useLocation , useNavigate} from 'react-router-dom';
 import React,{useState,useRef,useEffect} from 'react';
+import colorScheme from '../../Colors/Styles.js';
 import "react-toastify/dist/ReactToastify.css";
-import colorScheme from '../Colors/Styles.js';
 import { toast } from "react-toastify";
-import {useQuery} from 'react-query';
-import Select from 'react-select';
 import axios from 'axios';
 
 
 const UpdateTherapist = () => {
   const location = useLocation();
   const {ID} = location.state;
-  const {mutate:regTherapist} = TherapistEndPoint.useRegTherapist();
+  const navigate = useNavigate();
 
+  const formRef = useRef(null);
 
     // Therapist ID hook:
     const[therapistID , setTherapistID] = useState(ID)
 
     // Therapist Form Hooks:
-    const[multiPostcode , setMultiPostcode ] = useState('') 
+    const[multiPostcode , setMultiPostcode ] = useState('');
+    const[multiPostcodeRegion , setMultiPostcodeRegion] = useState('')
+
+    const[address , setAddress] = useState('');
     const[postCode, setPostCode] = useState('');
-    const[profileImg , setProfileImg] = useState(null); 
-    const[qualificationImageOne , setQualificationImageOne] = useState(null);
-    const[qualificationImageTwo , setQualificationImageTwo] = useState(null);
-    const[qualificationImageThree , setQualificationImageThree] = useState(null);
+    const[postcodeRegion , setPostcodeRegion] = useState('');
+
+    const[profileImg , setProfileImg] = useState('');
+    const[showprofileImg , setShowProfileImg] = useState('');
 
 
-    
-    const[getEmail , setEmail] = useState('');
+
+    const[titleOne , setTitleOne] = useState('');
+    const[qualificationImageOne , setQualificationImageOne] = useState('');
+    const[showQualificationImageOne , setShowQualificationImageOne] = useState('');
+
+
+    const[titleTwo , setTitleTwo] = useState('');
+    const[qualificationImageTwo , setQualificationImageTwo] = useState('');
+    const[showQualificationImageTwo , setShowQualificationImageTwo] = useState('');
+
+
+    const[titleThree , setTitleThree] = useState('');
+    const[qualificationImageThree , setQualificationImageThree] = useState('');
+    const[showQualificationImageThree , setShowQualificationImageThree] = useState('');
 
 
 
     // loading and conditing hooks:
-    const[input , setInput] = useState(false);
     const[loading , setLoading] = useState(false);
 
-    // Categories hooks:
-    const[category, setCategory] = useState([]);
-
-
-    //   Selecting Multiple Categories therapist Hooks:
-    const[selectCategoryOptions , setSelectCategoryOptions] = useState([]);
-    const[selectedCategoryOptions , setSelectedCategoryOptions] = useState([]);
-
-    const[selectCategoryID , setSelectCategoryID] = useState([]);
-
-    const formRef = useRef(null);
-
-
-
-    // Custom Colors integration in Select:
-    const customStyles = {
-      option: (base, { data, isDisabled, isFocused, isSelected }) => {
-      return {
-        ...base,
-        backgroundColor: isSelected ? colorScheme.card_bg_color: isFocused ?colorScheme.card_bg_color :colorScheme.card_txt_color,
-        color: isFocused? "#fff":"black",
-        borderColor: isFocused ?colorScheme.card_bg_color : 'gray',
-      };
-    }
-    };
-
-
-    // Selecting Multiple Categories therapist function:
-    const handleOptionChange = (selectedValues) => {
-      setSelectCategoryOptions(selectedValues);
-      const selectedLabels = selectedValues.map((option) => option.label);
-      setSelectedCategoryOptions(selectedLabels)
-    };
-
-  
-    // Getting therapist categories function:
-    const options = category.map((category) => ({
-      value: category.id,
-      label: category.title,
-    }));
 
     const handlePostcodeInputChange = (e)=>{
       setMultiPostcode(e.target.value)
+
+    }
+
+    const hanldeRegionInputChange = (e)=>{
+      setMultiPostcodeRegion(e.target.value)
 
     }
 
@@ -88,13 +64,20 @@ const UpdateTherapist = () => {
     function gettingIndviTherapist(){
         axios.post(`${process.env.REACT_APP_BASE_URL}fetchtherapistwithid/${ID}`)
         .then((res)=>{
+          setAddress(res.data.data.address)
           setPostCode(res.data.data.postcode)
-          setProfileImg(res.data.data.image)
-          setQualificationImageOne(res.data.data.image1)
-          setQualificationImageTwo(res.data.data.image2)
-          setQualificationImageThree(res.data.data.image3)
+          setPostcodeRegion(res.data.data.postcode_address)
 
+          setShowProfileImg(res.data.data.image)
+          setShowQualificationImageOne(res.data.data.image1)
+          setShowQualificationImageTwo(res.data.data.image2)
+          setShowQualificationImageThree(res.data.data.image3)
+        
+          setTitleOne(res.data.data.image1_name)
+          setTitleTwo(res.data.data.image2_name)
+          setTitleThree(res.data.data.image3_name)
 
+          
       
   
         })
@@ -108,112 +91,85 @@ const UpdateTherapist = () => {
       e.preventDefault();
       setLoading(true)
       const postcodeArray = multiPostcode.split(",").map((value)=> value.trim());
-      if(multiPostcode && profileImg){
+      const postcodeRegionArray = multiPostcodeRegion.split(",").map((value)=> value.trim());
         
       var formdata = new FormData();
-      formdata.append("postcode",postcodeArray);
+
+      
+      address &&
+      formdata.append("address",address);
+      if (multiPostcode) {
+        const postcodeArray = multiPostcode.split(",").map((value) => value.trim());
+        formdata.append("postcode", postcodeArray);
+      }
+      else{
+        postCode &&
+        formdata.append("postcode",postCode);
+      }
+
+
+      if (multiPostcodeRegion) {
+        const postcodeRegionArray = multiPostcodeRegion.split(",").map((value) => value.trim());
+        formdata.append("postcode_address", postcodeRegionArray);
+      }
+      else{
+        postcodeRegion && 
+        formdata.append("postcode_address",postcodeRegion);
+      }
+
+
+      profileImg  &&
       formdata.append("image", profileImg);
+
+      titleOne &&
+      formdata.append("image1_name", titleOne);
+      qualificationImageOne &&
       formdata.append("image1", qualificationImageOne);
 
+      titleTwo &&
+      formdata.append("image2_name", titleTwo);
       qualificationImageTwo &&
       formdata.append("image2", qualificationImageTwo);
+
+      
+      titleThree &&
+      formdata.append("image3_name", titleThree);
       qualificationImageThree &&
       formdata.append("image3", qualificationImageThree);
 
 
       axios.post(`${process.env.REACT_APP_BASE_URL}updateTherapistPostcode/${therapistID}`, formdata)
       .then((res)=>{
-        toast.info("Postcode Updated!", {theme:"dark"})
+        toast.info("Info Updated!", {theme:"dark"})
         setLoading(false)
-        setInput(false)
+        setTimeout(() => {
+          navigate('/TherapistSheet')
+        }, 2500);
       })
       .catch((err)=>{
         if(err.response.data.status === '401'){
 
           toast.warn("Profile & Qualification-1 type must be: jpeg,jpg,pdf ",{theme:"dark"}) 
           setLoading(false)
-          setInput(false)
         }
         else{
           toast.warn("Something went wrong",{theme:"dark"}) 
           setLoading(false)
-          setInput(false)
         }
               
 
 
       })
 
-      }
-
-      else{
-      toast.warn("Fill the information!",{theme:"dark"})
-      setLoading(false)
-      setInput(true)
-
-      }
-
+  
 
     }
 
 
-// Getting Therapist Category function:
-  useQuery('all_users',therapistCategoryEndPoint.getAllCategories,{
-    onSuccess:(data)=>{
-      setCategory(data.data.Categorys)
-   },
-   onError: (err) => {
-    return err;
-  }
-}
-
- )
 
 
 
-// Registering Therapist function: 
-  // const handleSubmitTherapistReg =  (e)=>{
-  //   e.preventDefault();
-  //     setLoading(true)
-  //     if(selectedCategoryOptions && userName && getEmail  && profileImg){
 
-  //         var formdata = new FormData();
-  //         formdata.append("email", getEmail);
-  //         formdata.append("therapist_name",userName);
-  //         formdata.append("category_id", 1122);
-  //         formdata.append("category_name", selectedCategoryOptions);
-  //         formdata.append("password", password);
-  //         formdata.append("postcode", postCode);
-          
-  //         profileImg &&
-  //         formdata.append("image", profileImg, "[PROXY]")
-          
-  //         regTherapist(formdata, {
-  //           onMutate: () => {
-  //             setLoading(true);
-  //           },
-  //           onSettled: () => {
-
-  //             setLoading(false);
-  //             setInput(false);
-  //           }
-  //         })
-
-  //         setPostCode('')
-  //         setProfileImg(null)
-  //         formRef.current.reset();
-
-            
-  //   }
-  //   else{
-      
-  //     toast.warn("Fill the information !",{theme:"dark"})
-  //     setLoading(false)
-  //     setInput(true)
-  //   }
-
-
-  // }
 
   useEffect(() => {
     gettingIndviTherapist()
@@ -229,8 +185,8 @@ const UpdateTherapist = () => {
       <div className="row mb-2">
         <div className="col-sm-6 d-flex">
           <h1 style={{color:colorScheme.card_txt_color}}>Update Therapist</h1>&nbsp;&nbsp;
-          <h2> \ </h2>&nbsp;&nbsp;
-          <Link to="/TherapistSheet" className="text-white"><h3>"Therapist Sheet"</h3></Link>
+          {/* <h2> \ </h2>&nbsp;&nbsp;
+          <Link to="/TherapistSheet" className="text-white"><h3>"Therapist Sheet"</h3></Link> */}
         </div>
       </div>
     </div>
@@ -298,56 +254,99 @@ const UpdateTherapist = () => {
                     
                     </div> */}
                     
-                    <div className="col-lg-6 col-sm-12">
+                    <div className="col-lg-4 col-sm-12">
                     <div className="form-group">
-                  <label htmlFor="exampleInputPassword6">Profile Image*</label>
-                  <input type="file" name="image" className={(profileImg === null ||'')&& input === true?"form-control border border-danger p-1":"form-control p-1"} id="exampleInputPassword6"  onChange={(e)=>setProfileImg(e.target.files[0])}  style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}}/>
-                    <a alt="img-1" style={{cursor:"pointer"}} onClick={()=> window.open(`${process.env.REACT_APP_IMG_URL}${profileImg}`,'_blank')}>
+                  <label htmlFor="exampleInputPassword6">Profile Image* (Optional)</label>
+                  <input type="file" name="image" className="form-control p-1" id="exampleInputPassword6"  onChange={(e)=>setProfileImg(e.target.files[0])}  style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}}/>
+                    <a alt="img-1" style={{cursor:"pointer"}} onClick={()=> window.open(`${process.env.REACT_APP_IMG_URL}${showprofileImg}`,'_blank')}>
                     <span>preview profile_image</span>
                     </a>
                 </div>
                     </div>
 
                     
-                <div className="col-lg-6 col-sm-12">
+                <div className="col-lg-4 col-sm-12">
                     <div className="form-group">
                   <label htmlFor="exampleInputPassword8">Post Code*</label>
-                  <input type="text" name="postcode" defaultValue={postCode} className={multiPostcode === ''&& input === true?"form-control border border-danger":"form-control"} id="exampleInputPassword8"  onChange={handlePostcodeInputChange} placeholder="Enter PostCode" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color, textTransform:"uppercase"}} />
+                  <input type="text" name="postcode" defaultValue={postCode} className={"form-control"} id="exampleInputPassword8"  onChange={handlePostcodeInputChange} placeholder="Enter PostCode" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
+                </div>
+                </div>
+
+                            
+                <div className="col-lg-4 col-sm-12">
+                    <div className="form-group">
+                  <label htmlFor="exampleInputPassword11">Regions*</label>
+                  <input type="text" name="postcodeRegion" defaultValue={postcodeRegion} className={"form-control"} id="exampleInputPassword11"  onChange={hanldeRegionInputChange} placeholder="Enter Region" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
                 </div>
                 </div>
 
 
                 </div>
+
+                <div className="row">
+                <div className="col-lg-12">
+                    <div className="form-group">
+                  <label htmlFor="exampleInputPassword16">Address*</label>
+                  <input type="text" name="address" defaultValue={address} className={"form-control"} id="exampleInputPassword16"  onChange={(e)=>setAddress(e.target.value)} placeholder="Enter Address" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
+                </div>
+                </div>
+
+                </div>
+
              
                 <div className="row">
 
-                  
+                <div className="col-lg-4 col-sm-12">
+                    <div className="form-group">
+                  <label htmlFor="exampleInputPassword12">Title 1*</label>
+                  <input type="text" name="titleOne" defaultValue={titleOne} className={"form-control"} id="exampleInputPassword12"  onChange={(e)=>setTitleOne(e.target.value)} placeholder="Enter Title One" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
+                </div>
+                </div>
 
                 <div className="col-lg-4 col-sm-12">
                     <div className="form-group">
-                        <label htmlFor="exampleInputEmail5">Qualification 1*</label>
+                        <label htmlFor="exampleInputEmail5">Qualification 1*(Optional)</label>
                         <input type="file" name="image-1"  className="form-control p-1" id="exampleInputEmail5"  onChange={(e)=>setQualificationImageOne(e.target.files[0])}  style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
-                        <a alt="img-1" style={{cursor:"pointer"}} onClick={()=> window.open(`${process.env.REACT_APP_IMG_URL}${qualificationImageOne}`,'_blank')}>
+                        <a alt="img-1" style={{cursor:"pointer"}} onClick={()=> window.open(`${process.env.REACT_APP_IMG_URL}${showQualificationImageOne}`,'_blank')}>
                     <span>preview pdf-1/docx</span>
                     </a>
                     </div>
                     </div>
 
+                    
+                <div className="col-lg-4 col-sm-12">
+                    <div className="form-group">
+                  <label htmlFor="exampleInputPassword13">Title 2*(Optional)</label>
+                  <input type="text" name="titleTwo" defaultValue={titleTwo} className={"form-control"} id="exampleInputPassword13"  onChange={(e)=>setTitleTwo(e.target.value)} placeholder="Enter Title Two" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
+                </div>
+                </div>
+
+
                     <div className="col-lg-4 col-sm-12">
                     <div className="form-group">
-                        <label htmlFor="exampleInputEmail7">Qualification 2*</label>
+                        <label htmlFor="exampleInputEmail7">Qualification 2*(Optional)</label>
                         <input type="file" name="image-2"  className="form-control p-1" id="exampleInputEmail7"  onChange={(e)=>setQualificationImageTwo(e.target.files[0])}  style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
-                        <a alt="img-2" style={{cursor:"pointer"}} onClick={()=> window.open(`${process.env.REACT_APP_IMG_URL}${qualificationImageTwo}`,'_blank')}>
+                        <a alt="img-2" style={{cursor:"pointer"}} onClick={()=> window.open(`${process.env.REACT_APP_IMG_URL}${showQualificationImageTwo}`,'_blank')}>
                     <span>preview pdf-2/docx</span>
                     </a>
                     </div>
                     </div>
 
+                    
+                <div className="col-lg-4 col-sm-12">
+                    <div className="form-group">
+                  <label htmlFor="exampleInputPassword14">Title 3*(Optional)</label>
+                  <input type="text" name="titleThree" defaultValue={titleThree} className={"form-control"} id="exampleInputPassword13"  onChange={(e)=>setTitleThree(e.target.value)} placeholder="Enter Title Three" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
+                </div>
+                </div>
+
+                    
+
                     <div className="col-lg-4 col-sm-12">
                     <div className="form-group">
-                        <label htmlFor="exampleInputEmail9">Qualification 3*</label>
+                        <label htmlFor="exampleInputEmail9">Qualification 3*(Optional)</label>
                         <input type="file" name="image-3"  className="form-control p-1" id="exampleInputEmail9"  onChange={(e)=>setQualificationImageThree(e.target.files[0])}  style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
-                        <a alt="img-3" style={{cursor:"pointer"}} onClick={()=> window.open(`${process.env.REACT_APP_IMG_URL}${qualificationImageThree}`,'_blank')}>
+                        <a alt="img-3" style={{cursor:"pointer"}} onClick={()=> window.open(`${process.env.REACT_APP_IMG_URL}${showQualificationImageThree}`,'_blank')}>
                     <span>preview pdf-3/docx</span>
                     </a>
                     </div>

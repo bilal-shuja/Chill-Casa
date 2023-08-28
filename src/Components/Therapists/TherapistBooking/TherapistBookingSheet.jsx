@@ -3,13 +3,10 @@ import colorScheme from "../../Colors/Styles.js";
 import "react-toastify/dist/ReactToastify.css";
 import React,{useState,useEffect} from 'react';
 import ReadMoreReact from 'read-more-react';
-// import {toast} from "react-toastify";
-import {Link} from 'react-router-dom';
 import {useQuery} from 'react-query';
 import { format } from 'date-fns';
 import axios from 'axios';
-// import Moment from 'react-moment';
-// import 'moment-timezone';
+
 const TherapistBookingSheet = () => {
 
 
@@ -19,25 +16,64 @@ const TherapistBookingSheet = () => {
 
 
     // Hook's for search filter:
-    const[timeFrom , setTimeFrom] = useState('');
-    const[timeTo , setTimeTo] = useState('');
+    const[startTime , setStartTime] = useState('');
+    const[endTime , setEndTime] = useState('');
+    const [combinedTimeSlots, setCombinedTimeSlots] = useState([]);
+
     const[dateForTimeslot ,setDateForTimeslot] = useState('')
     const[postcode, setPostcode] = useState('');
 
     // Hooks for pagination:
     const[pages , setPages] = useState(1);
     const[count , setCount] = useState('');
-    
 
-    // Hook for showing specific length in table:
-    const[showLength, setShowLength] = useState(10);
+  const [filteredCount, setFilteredCount] = useState(0);
 
-    // function for showing specific length in table:
-    const remainingThreapistCount = availableTherapists && availableTherapists.length > 0 ? "Loading...": availableTherapists? availableTherapists.slice(showLength) : [];
     
     // Hooks for getting current date & format:
     const [currentDate, setCurrentDate] = useState(new Date());
     const [formattedDate, setFormattedDate] = useState('');
+
+    // Time slots array:
+    const availableTimeSlots = [
+      "12:00am",
+      "1:00am",
+      "2:00am",
+      "3:00am",
+      "4:00am",
+      "5:00am",
+      "6:00am",
+      "7:00am",
+      "8:00am",
+      "9:00am",
+      "10:00am",
+      "11:00am",
+      "12:00pm",
+      "1:00pm",
+      "2:00pm",
+      "3:00pm",
+      "4:00pm",
+      "5:00pm",
+      "6:00pm",
+      "7:00pm",
+      "8:00pm",
+      "9:00pm",
+      "10:00pm",
+      "11:00pm"
+    ];
+
+        // Start time/slot input functions:
+        const handleStartTimeSlotChange = (e)=>{
+          setStartTime(e.target.value)
+        }
+
+        // End time/slot input functions:
+        const handleEndTimeSlotChange = (e)=>{
+          setEndTime(e.target.value)
+        }
+
+  
+
 
 
 
@@ -96,11 +132,14 @@ const TherapistBookingSheet = () => {
     
     // function for getting therapist specific date  & time-slot: 
     const  checkTherapistByDateAndTime = () => {
+    // const timeSlotArray = startTime.split(",").map((value)=> value.trim());
+    const jsonEncodedTimeSlots =JSON.stringify(combinedTimeSlots)
+
       const dateAndTimeObj ={
         date : dateForTimeslot,
-        start_time:timeFrom,
-        end_time:timeTo,
+        time:jsonEncodedTimeSlots
       }
+
             axios.post(`${process.env.REACT_APP_BASE_URL}getTimeslotsByDateandTime?${pages}`,dateAndTimeObj)
          .then((res)=>{
           setAvailableTherapists(res.data.available_therapists)
@@ -121,6 +160,16 @@ const TherapistBookingSheet = () => {
           setFormattedDate(formatted);
     }, [currentDate])
 
+    useEffect(() => {
+      if (startTime && endTime) {
+        const combinedSlots = [startTime, endTime];
+        setCombinedTimeSlots(combinedSlots);
+      } else {
+        // Clear the combined slots if either startTime or endTime is empty
+        setCombinedTimeSlots([]);
+      }
+  }, [startTime, endTime])
+
 
 
 
@@ -129,6 +178,10 @@ const TherapistBookingSheet = () => {
 
 const filterTherapistData =  availableTherapists && availableTherapists.length > 0 && postcode !== "" ? availableTherapists.filter((items)=> items.postcode === postcode)
 : availableTherapists
+
+useEffect(() => {
+  setFilteredCount(filterTherapistData.length);
+}, [filterTherapistData])
 
   return (
     <>
@@ -139,7 +192,7 @@ const filterTherapistData =  availableTherapists && availableTherapists.length >
             <div className="row mb-2">
               <div className="col-sm-6">
                 <h1 style={{ color: colorScheme.card_txt_color }}>
-                Therapists
+                Available Therapists
                 </h1>
               </div>
               <div className="col-sm-6">
@@ -160,7 +213,16 @@ const filterTherapistData =  availableTherapists && availableTherapists.length >
                 <div className="card" style={{background: colorScheme.card_bg_color,color: colorScheme.card_txt_color,boxShadow: colorScheme.box_shadow_one,}}>
                   
                   <div className="card-header">        
-                    <h5>Therapists Sheet</h5>
+                    <h5>Available Therapists List</h5>
+
+                    <button
+                        className="btn btn-outline-info btn-sm"
+                        onClick={() => {
+                          window.location.reload();
+                        }}
+                      >
+                        Refresh Page
+                      </button>
                         
                   <div className="row">
                       <div className="col-sm-6">
@@ -190,37 +252,58 @@ const filterTherapistData =  availableTherapists && availableTherapists.length >
 
 
                     <div className="row ">
-                    <div className="col-sm-3">
+                    <div className="col-lg-3 col-sm-12">
                       
-                        <label htmlFor="" className="form-label">Hours/Slots(FROM):</label>
-                            <div className="form-group">
-                              <input type="text" className="form-control" placeholder="Enter from..."
-                              style={{
-                                background: colorScheme.card_bg_color,
-                                color: colorScheme.card_txt_color,
-                                }}
-                                onChange={(e)=> setTimeFrom(e.target.value)}
-                              />
-                        </div> 
-                    </div>
-
-                    <div className="col-sm-3">
-                        <label htmlFor="" className="form-label"> Hours/Slots(TO):</label>
-                            <div className="form-group">
-                              <input type="text" className="form-control" placeholder="Enter To..."
-                              style={{
-                                background: colorScheme.card_bg_color,
-                                color: colorScheme.card_txt_color,
-                                }}
-                                onChange={(e)=> setTimeTo(e.target.value)}
-                              />
-                        </div>
+                        <label htmlFor="" className="form-label">Select Start Time:</label>
                         
+                  <select  className="form-control"
+                            style={{
+                              background: colorScheme.card_bg_color,
+                              color: colorScheme.card_txt_color,
+                              }}
+                              onChange={handleStartTimeSlotChange}
+                              >
+                                  <option value="none">Select</option>
+                                  {
+                                    availableTimeSlots.map((time)=>{
+                                      return(
+                                        <option value={time}>{time}</option>
+                                      )
+                                    })
+                                  }
+                                 
+
+                          </select>
                     </div>
 
-                    <div className="col-sm-3">
+                    <div className="col-lg-3 col-sm-12">
                       
-                      <label htmlFor="" className="form-label">Date for timeslots:</label>
+                      <label htmlFor="" className="form-label">Select End Time:</label>
+                      
+                <select  className="form-control"
+                          style={{
+                            background: colorScheme.card_bg_color,
+                            color: colorScheme.card_txt_color,
+                            }}
+                            onChange={handleEndTimeSlotChange}
+                            >
+                                <option value="none">Select</option>
+                                {
+                                  availableTimeSlots.map((time)=>{
+                                    return(
+                                      <option value={time}>{time}</option>
+                                    )
+                                  })
+                                }
+                               
+
+                        </select>
+                  </div>
+
+
+                    <div className="col-lg-3 col-sm-12">
+                      
+                      <label htmlFor="" className="form-label">Select Date for timeslots:</label>
                           <div className="form-group">
                             <input type="date" className="form-control" 
                             style={{
@@ -231,7 +314,7 @@ const filterTherapistData =  availableTherapists && availableTherapists.length >
                             />
                       </div> 
                   </div>
-                  <div className="col-sm-3 d-flex align-self-center mt-3">
+                  <div className="col-lg-3 col-sm-12  align-self-center mt-3">
                   <button onClick={checkTherapistByDateAndTime} className="btn btn-outline-info">Check by slots</button>
                   
                   </div>
@@ -243,7 +326,7 @@ const filterTherapistData =  availableTherapists && availableTherapists.length >
 
                     {
 
-                (availableTherapists &&  availableTherapists.length > 0 ) ?
+                availableTherapists &&  availableTherapists.length > 0  ?
 
                 (
                 <table className="table  text-nowrap">
@@ -257,8 +340,10 @@ const filterTherapistData =  availableTherapists && availableTherapists.length >
                         <th>Therapist Services</th>
                         <th>Profile</th>
                         <th>Address</th>
-                        <th>Region/Postcode</th>
+                        <th>Postcode</th>
+                        <th>Regions</th>
                         <th>Selected Date</th>
+                        <th>Time/Slots</th>
                         <th>Status</th>
                         <th>Rating</th>
                         <th>Actions</th>
@@ -267,9 +352,9 @@ const filterTherapistData =  availableTherapists && availableTherapists.length >
 
                     <tbody className="text-center">
                       {
-                     filterTherapistData.filter((items, index)=> index <= showLength).map((items,index)=>{
+                     filterTherapistData.map((items,index)=>{
                       return(
-                          <tr key={index} style={{ color: colorScheme.card_txt_color }}>
+                        <tr key={index} style={{ color: colorScheme.card_txt_color }} >
                           <td>{filterTherapistData.length - index}</td>
                           <td>{items.firstname}</td>
                           <td>{items.lastname}</td>
@@ -279,31 +364,60 @@ const filterTherapistData =  availableTherapists && availableTherapists.length >
                             return(
                               <li style={{listStyle:"none"}}>{category}</li>
                             )
-                          })}</td>
+                          })}
+                          </td>
                           <td>
                           <img
                               src={`${process.env.REACT_APP_IMG_URL}${items.image}`}
                               alt=""
                               width={50}
-                            />
+                              />
                           </td>
-                          <td>
+                              <td>
                           <ReadMoreReact
-                                text={
-                                 items.address
+                              text={
+                                    items.address
                                 }
                                 min={10}
                                 ideal={20}
                                 max={50}
-                                readMoreText="...Read More"
-                              />                            
+                              readMoreText="Read more..."
+                            />  
                           </td>
-                          <td>{items.postcode.map((postcode)=>{
+
+                          <td>{
+                           items.postcode === null || "" || ![]?
+                           "No Postcode Found!"
+                         :
+                          items.postcode.map((postcode)=>{
                             return(
                               <li style={{listStyleType:"none"}}>{postcode}</li>
                             )
-                          })}</td>
-                          <td>{items.Idate}</td>
+                          })}
+                          
+                          </td>
+
+                          <td>
+                          {
+                          items.postcode_address === null || "" || ![]?
+                            "No Regions Found!"
+                          :
+                          items.postcode_address.map((postcode_address)=>{
+                            return(
+                              <li style={{listStyleType:"none"}}>{postcode_address}</li>
+                            )
+                          })}
+                          </td>
+                          <td>{items.date}</td>
+                          <td>
+                          {Array.isArray(items.time) && items.time.length > 0 ? (
+                                  items.time.map((time) => (
+                                    <li style={{ listStyleType: "none" }}>{time}</li>
+                                  ))
+                                ) : (
+                                  "No Time slots found!"
+                                )}
+                          </td>
                           {
                             items.status === "ACTIVE"?
                             <td className="text-success">
@@ -320,19 +434,21 @@ const filterTherapistData =  availableTherapists && availableTherapists.length >
 
                           }
 
-                          <td>{items.rating}</td>
-
-                          <td>
+                        <td>{items.rating}</td>
+                        <td>
                             .....
                           {/* <Link className="btn btn-outline-info btn-sm" to="/UpdateTherapist" state={{ID:items.id}}>
                           <i className="fa fa-pen"></i>
                           </Link> */}
                           </td>
-                          </tr>
-                      )
+
+
+                        </tr>
+                        
+                      );
                      })
                       
-                      }
+                    }
 
                     </tbody>
                     
@@ -347,16 +463,16 @@ const filterTherapistData =  availableTherapists && availableTherapists.length >
                     </div>
                   )
                 
-                    }
+              }
 
                   <button className="btn btn-outline-light btn-sm" onClick={handlePrevPage} disabled={pages === 1}>
                 <i className="fa-solid fa-arrow-left"></i>
                 </button>
                 &nbsp;&nbsp;
-                <button className="btn btn-outline-light btn-sm" onClick={handleNextPage} disabled={totalResults <= 10}>
+                <button className="btn btn-outline-light btn-sm" onClick={handleNextPage} disabled={totalResults <= endResult}>
                   <i className="fa-solid fa-arrow-right"></i>
                 </button>
-                <p >Showing {startResult} - {endResult} of {totalResults} results</p>
+                <p >Showing {startResult} - {endResult} of {filteredCount} results</p>
 
 
                     {/* {remainingThreapistCount && remainingThreapistCount.length > 0 && (

@@ -1,20 +1,31 @@
-import TherapistTimelineModal from '../UserTimeline/UserTimelineModal';
-import TherapistEndPoint from "../Api/TherapistEndPoints.js";
+import TherapistTimelineModal from '../../Therapists/TherapistTimeline/TherapistTimelineModal';
+import TherapistEndPoint from "../../Api/TherapistEndPoints.js";
+import React, { useState , useEffect} from "react";
+import colorScheme from "../../Colors/Styles.js";
 import "react-toastify/dist/ReactToastify.css";
-import colorScheme from "../Colors/Styles.js";
 import ReadMoreReact from 'read-more-react';
 import { Link } from "react-router-dom";
-import React, { useState } from "react";
 import { useQuery } from "react-query";
 import { Modal } from "pretty-modal";
 
 
 const TherapistSheet = () => {
   const { mutate: chnagetherapistStatus } =TherapistEndPoint.useTherapistStatus();
+  const {mutate:postAdminComments} = TherapistEndPoint.useAdminComment();
+
 
   const [therapists, setAllTherapists] = useState([]);
 
-  // Hook's for search filter:
+
+  // Hook's for normal search filter:
+
+  const[firstname , setFirstName] = useState('');
+  const[lastName , setLastName] = useState('');
+  const[email, setEmail] = useState('');
+  const[contact , setContact] = useState('');
+
+
+  // Hook's for advance search filter:
   const [date, setDate] = useState("");
   const[gender , setGender] = useState("");
   const[status , setStatus] = useState("")
@@ -23,14 +34,20 @@ const TherapistSheet = () => {
   const [stateID, setStateID] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
-  //Hook for setting-up entries in table:
-  const [showLength, setShowLength] = useState(20);
 
   const [therapistStatus, setTherapistStatus] = useState("ACTIVE");
+
+
+  const[therapistID , setTherapistID] = useState('');
+  const[adminComments , setAdminComments] = useState('');
+
 
   // Hook for pagination:
   const[pages , setPages] = useState(1);
   const[count , setCount] = useState('');
+
+  const [filteredCount, setFilteredCount] = useState(0);
+
 
 
   const resultsPerPage = 10;
@@ -51,11 +68,7 @@ const TherapistSheet = () => {
   const handleSelectStatus = (e)=>{
     setStatus(e.target.value)
   }
-  //  Method for getting specific amount of entities in table:
-  const remainingThreapistCount =
-    therapists && therapists.length > 0
-      ? "...Loading"
-      : therapists.slice(showLength);
+
 
   // Getting all therapists function:
   useQuery(["all_therapits", pages], _=> TherapistEndPoint.getAllTherapists(pages), {
@@ -67,6 +80,17 @@ const TherapistSheet = () => {
       return err;
     },
   });
+
+  function submitAdminComments(){
+    const adminCommentObj = {
+      therapist_id:therapistID,
+      note:adminComments
+    }
+
+    postAdminComments(adminCommentObj)
+    setAdminComments(" ")
+
+  }
 
   const totalResults = count|| 0;
   const startResult = (pages - 1) * resultsPerPage + 1;
@@ -81,16 +105,37 @@ const TherapistSheet = () => {
 
   // Filter function against different inputs(e.g. date,postcode,status, gender):
   const filterTherapistData =
-    therapists.length > 0 && date !== "" && gender === "" && postcode === "" && status === ""
+      therapists.length > 0 && 
+      firstname !== "" && lastName === ""&& email === "" && contact === "" && date === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) => items.firstname === firstname)
+      :
+      firstname === "" && lastName !== ""&& email === "" && contact === "" && date === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) => items.lastname === lastName)
+      :
+      firstname === "" && lastName === ""&& email !== "" && contact === "" && date === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) => items.email === email)
+      :
+      firstname === "" && lastName === ""&& email === "" && contact !== "" && date === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) => items.phone_number === contact)
+      :
+      firstname === "" && lastName === ""&& email === "" && contact === "" && date !== "" && gender === "" && postcode === "" && status === ""
       ? therapists.filter((items) => items.Idate === date)
-      : gender !== "" && date === "" && postcode === "" && status === ""
+      : 
+      firstname === "" && lastName === ""&& email === "" && contact === "" &&  gender !== "" && date === "" && postcode === "" && status === ""
       ? therapists.filter((items) => items.gender === gender)
-      : postcode !== "" && date === "" && gender === "" && status === "" 
-      ? therapists.filter((items) => items.postcode === postcode)
-      : status !== "" && date === "" && gender === "" && postcode === ""
+      : 
+      firstname === "" && lastName === ""&& email === "" && contact === "" &&  postcode !== "" && date === "" && gender === "" && status === "" 
+      ? therapists.filter((items) =>items.postcode.includes(postcode))
+      : 
+      firstname === "" && lastName === ""&& email === "" && contact === "" &&  (status !== "" || status === "All") && date === "" && gender === "" && postcode === ""
       ? therapists.filter((items) => items.status === status)
       : therapists
       
+      useEffect(() => {
+        setFilteredCount(filterTherapistData.length);
+      }, [filterTherapistData])
+
+
 
   function TherapistSheet({ items, index }) {
     const [isShowUserModal,setShowUserModal] = useState(false)
@@ -101,11 +146,13 @@ const TherapistSheet = () => {
     return (
       <>
         <tr key={index} style={{ color: colorScheme.card_txt_color }} >
+          {/* <td>{items.id}</td> */}
           <td>{filterTherapistData.length - index}</td>
           <td>{items.firstname}</td>
           <td>{items.lastname}</td>
           <td>{items.gender}</td>
           <td>{items.phone_number}</td>
+          <td>{items.email}</td>
           <td>
           <ReadMoreReact
                text={
@@ -152,7 +199,7 @@ const TherapistSheet = () => {
               width={50}
             />
           </td>
-          <td style={{textTransform:"uppercase"}}>
+          <td >
             {
             items.postcode === null || "" || ![]?
             "no postcode found"
@@ -171,6 +218,26 @@ const TherapistSheet = () => {
           </td>
 
           <td>
+            {
+            items.postcode_address === null || "" || ![]?
+            "no regions found"
+            :
+            items.postcode_address.map((regions)=>{
+            return(
+              <li
+              key={regions}
+              className="text-center"
+              style={{ listStyleType: "none" }}
+            >
+              {regions}
+            </li>
+            )
+          })}
+          </td>
+
+          <td>{items.image1_name === "" || null ? "No Title":items.image1_name }</td>
+
+          <td>
           <object   
           src={`${process.env.REACT_APP_IMG_URL}${items.image1}`} 
           style={{ cursor: 'pointer' }}
@@ -182,6 +249,44 @@ const TherapistSheet = () => {
             <i className="fa-solid fa-file-pdf text-danger fa-2x"></i>
             </object>
           </td>
+
+          <td>{items.image2_name === "" || null ? "No Title":items.image2_name }</td>
+
+            <td>
+              {
+                items.image2 === null || ""? "No docs" :
+
+                <object   
+                src={`${process.env.REACT_APP_IMG_URL}${items.image2}`} 
+                style={{ cursor: 'pointer' }}
+                width={50}
+                height={50}           
+                title={`Document ${index + 1}`} 
+                onClick={()=> window.open(`${process.env.REACT_APP_IMG_URL}${items.image2}`,'_blank')}
+                >
+                  <i className="fa-solid fa-file-pdf text-danger fa-2x"></i>
+                  </object>
+              }
+       
+            </td>
+
+            <td>{items.image3_name === "" || null ? "No Title":items.image3_name }</td>
+
+                  <td>
+                  {
+                items.image3 === null || ""? "No docs" :
+                  <object   
+                  src={`${process.env.REACT_APP_IMG_URL}${items.image3}`} 
+                  style={{ cursor: 'pointer' }}
+                  width={50}
+                  height={50}           
+                  title={`Document ${index + 1}`} 
+                  onClick={()=> window.open(`${process.env.REACT_APP_IMG_URL}${items.image3}`,'_blank')}
+                  >
+                    <i className="fa-solid fa-file-pdf text-danger fa-2x"></i>
+                    </object>
+                  }
+                  </td>
 
 
           <td>{items.Idate}</td>
@@ -196,7 +301,8 @@ const TherapistSheet = () => {
             >
               <i className="fa fa-pen"></i>
             </Link>
-            &nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;
+
             <button
               onClick={() => {
                 setIsOpen(true);
@@ -208,13 +314,25 @@ const TherapistSheet = () => {
               <i className="fa-solid fa-spinner"></i>
             </button>
 
-            &nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;
 
-            <button className="btn btn-outline-primary btn-sm"  data-bs-toggle="tooltip" title="Therapist Timeline" onClick={()=>{
+            <button type="button" className="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#exampleModal"
+            data-bs-placement="left" title="admin comments"
+            onClick={()=>{setTherapistID(items.id)}}
+            >
+            <i className="fa-solid fa-paperclip"></i>
+          </button>
+
+            &nbsp;&nbsp;
+            <Link className="btn btn-outline-info btn-sm"  data-bs-toggle="tooltip" data-bs-placement="left" title="Therapist profile"  to="/TherapistProfile" state={{ID:items.id}}>
+              <i className="fa fa-user"></i>
+            </Link>&nbsp;&nbsp;
+
+            {/* <button className="btn btn-outline-primary btn-sm"  data-bs-toggle="tooltip" title="Therapist Timeline" onClick={()=>{
               setShowUserModal(true)
               }}>
               <i className="fa-solid fa-timeline"></i>
-            </button> 
+            </button>  */}
           </td>
         </tr>
 
@@ -265,7 +383,7 @@ const TherapistSheet = () => {
                     }}
                   >
                     <div className="card-header">
-                      <h5>Therapists Sheet</h5>
+                      <h5>Therapists List</h5>
                       <button
                         className="btn btn-outline-info btn-sm"
                         onClick={() => {
@@ -274,6 +392,84 @@ const TherapistSheet = () => {
                       >
                         Reset Filters
                       </button>
+
+                        {/* Normal Search */}
+                        <h5 className="mt-3">Normal Search:</h5>
+                     <div className="row p-2">
+                        <div className="col-lg-3 col-sm-12">
+                          <label htmlFor="" className="form-label">
+                            Search with Firstname:
+                          </label>
+                          <div className="form-group">
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Search by firstname..."
+                              style={{
+                                background: colorScheme.card_bg_color,
+                                color: colorScheme.card_txt_color,
+                              }}
+                              onChange={(e) => setFirstName(e.target.value)}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="col-lg-3 col-sm-12">
+                  <label htmlFor="" className="form-label">Search with Lastname*</label>
+                  <div className="form-group">
+
+                  <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Search by Lastname..."
+                              style={{
+                                background: colorScheme.card_bg_color,
+                                color: colorScheme.card_txt_color,
+                              }}
+                              onChange={(e) => setLastName(e.target.value)}
+                            />
+                  </div>
+                </div>
+
+                
+                <div className="col-lg-3 col-sm-12">
+                  <label htmlFor=""  className="form-label">Search with Email*</label>
+                  <div className="form-group">
+                  <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Search by Email..."
+                              style={{
+                                background: colorScheme.card_bg_color,
+                                color: colorScheme.card_txt_color,
+                              }}
+                              onChange={(e) => setEmail(e.target.value)}
+                            />
+                  </div>
+                </div>
+
+                        <div className="col-lg-3 col-sm-12">
+                          <label htmlFor="" className="form-label">
+                            Search with Contact:
+                          </label>
+                          <div className="form-group">
+                            <input
+                              type="number"
+                              className="form-control"
+                              placeholder="Search by Contact..."
+                              style={{
+                                background: colorScheme.card_bg_color,
+                                color: colorScheme.card_txt_color,
+                              }}
+                              onChange={(e) => setContact(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      {/* Normal Search */}
+                      
+                      {/* Advanced Search */}
+                        <h5>Advance Search:</h5>
                       <div className="row p-2">
                         <div className="col-lg-3 col-sm-12">
                           <label htmlFor="" className="form-label">
@@ -304,10 +500,9 @@ const TherapistSheet = () => {
                               }}
                               onChange={handleSelectGender}
                               >
-                                  <option value="none">Select</option>
+                                  <option value="none" disabled>Select</option>
                                   <option value="Male">Male</option>
                                   <option value="Female">Female</option>
-                                  <option value="Other">Other</option>
 
                           </select>
                   </div>
@@ -325,7 +520,7 @@ const TherapistSheet = () => {
                               }}
                               onChange={handleSelectStatus}
                               >
-                                  <option value="none">Select</option>
+                                  <option value="All">Select</option>
                                   <option value="ACTIVE">ACTIVE</option>
                                   <option value="IN-ACTIVE">IN-ACTIVE</option>
 
@@ -352,6 +547,8 @@ const TherapistSheet = () => {
                           </div>
                         </div>
                       </div>
+                      {/* Advanced Search */}
+                      
                     </div>
                     <div className="card-body table-responsive p-2">
                       {therapists && therapists.length > 0 ? (
@@ -364,23 +561,25 @@ const TherapistSheet = () => {
                               <th>Last Name</th>
                               <th>Gender</th>
                               <th>Contact</th>
+                              <th>Email</th>
                               <th>Address</th>
                               <th>Services Provided</th>
                               <th>Status</th>
                               <th>Image</th>
-                              <th>Regions/Postcode</th>
-                              <th>Documents</th>
+                              <th>Postcode</th>
+                              <th>Regions</th>
+                              <th>Docs Title1</th>
+                              <th>Document 1</th>
+                              <th>Docs Title2</th>
+                              <th>Document 2</th>
+                              <th>Docs Title3</th>
+                              <th>Document 3</th>
                               <th>Date</th>
-                              {/* {
-                          roleID === "2"|| roleID === "3"|| roleID === "4" || roleID === "6" ?  null: */}
                               <th>Actions</th>
-                              {/* } */}
                             </tr>
                           </thead>
                           <tbody className="text-center">
-                            {filterTherapistData
-                              .filter((items, index) => index <= showLength)
-                              .map((items, index) => {
+                            {filterTherapistData.map((items, index) => {
                                 return (
                                   <TherapistSheet items={items} index={index} />
                                 );
@@ -397,21 +596,11 @@ const TherapistSheet = () => {
                 <i className="fa-solid fa-arrow-left"></i>
                 </button>
                 &nbsp;&nbsp;
-                <button className="btn btn-outline-light btn-sm" onClick={handleNextPage} disabled={totalResults <= 10}>
+                <button className="btn btn-outline-light btn-sm" onClick={handleNextPage} disabled={totalResults <= endResult}>
                   <i className="fa-solid fa-arrow-right"></i>
                 </button>
-                <p >Showing {startResult} - {endResult} of {totalResults} results</p>
+                <p >Showing {startResult} - {endResult} of {filteredCount} results</p>
 
-                      {/* {remainingThreapistCount &&
-                        remainingThreapistCount.length > 0 && (
-                          // only display the "Show More" button if there are more rows to show
-                          <button
-                            className="btn btn-outline-info"
-                            onClick={() => setShowLength(showLength + 30)}
-                          >
-                            Show More
-                          </button>
-                        )} */}
                     </div>
                   </div>
 
@@ -452,27 +641,27 @@ const TherapistSheet = () => {
                     </div>
                   </Modal>
 
-                  {/*Query Modal Start  */}
+                  {/* Query Modal Start  */}
 
-                  {/* <div className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" >
+                  <div className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" >
               <div className="modal-dialog" >
                 <div className="modal-content" style={{background:colorScheme.card_bg_color,color:colorScheme.card_txt_color}}>
                   <div className="modal-header">
-                    <h5 className="modal-title" id="exampleModalLabel" style={{color:colorScheme.card_txt_color}}>Query Area</h5>
+                    <h5 className="modal-title" id="exampleModalLabel" style={{color:colorScheme.card_txt_color}}>Comment</h5>
                     <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true"  style={{color:colorScheme.card_txt_color}}>&times;</span>
                     </button>
                   </div>
                   <div className="modal-body">
-                    <textarea type="text" className="form-control" value={hostMessage} placeholder="Writer your query here..." row={6} style={{background:colorScheme.card_bg_color,color:colorScheme.card_txt_color}} onChange={(e)=>setHostMessage(e.target.value)}/>
+                    <textarea type="text" className="form-control" value={adminComments} placeholder=" Write comment here..." row={6} style={{background:colorScheme.card_bg_color,color:colorScheme.card_txt_color}} onChange={(e)=>setAdminComments(e.target.value)}/>
                     
                   </div>
                   <div className="modal-footer">
-                    <button type="button" className="btn btn-outline-info" onClick={submitHostQuery}>Submit</button>
+                    <button type="button" className="btn btn-outline-info" onClick={submitAdminComments}>Submit</button>
                   </div>
                 </div>
               </div>
-            </div> */}
+            </div>
 
                   {/* Query Modal End */}
                 </div>

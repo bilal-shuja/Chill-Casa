@@ -1,27 +1,20 @@
+import {Chart as ChartJs, Tooltip, Title, ArcElement, Legend} from 'chart.js';
 import React,{useState , useEffect} from 'react';
+import colorScheme from "../../Colors/Styles.js";
 import "react-toastify/dist/ReactToastify.css";
-import colorScheme from "../Colors/Styles.js";
-import ReadMoreReact from 'read-more-react';
+import { Doughnut } from 'react-chartjs-2';
 import Moment from 'react-moment';
 import Modal from 'react-modal';
-import 'moment-timezone';
 import axios from 'axios';
+import 'moment-timezone';
 
+
+ChartJs.register(
+  Tooltip, Title, ArcElement, Legend
+)
 const UserTimelineModal = ({ID,isShow,onHide}) => {
-    const[userInfo , setUserInfo] = useState('');
-    const[userDepo , setUserDepo] = useState([]);
-    const[userWithdrawal , setUserWithdrawal] = useState([]);
 
-    const[userTeamOne , setUserTeamOne] = useState([]);
-    const[userTeamTwo , setUserTeamTwo] = useState([]);
-    const[userTeamThree , setUserTeamThree] = useState([]);
-    const[userTeamFour , setUserTeamFour] = useState([]);
-    const[userTeamFive , setUserTeamFive] = useState([]);
-    const[userTeamSix , setUserTeamSix] = useState([]);
 
-    
-    const[getReferral, setReferral] = useState([])
-    const[userTotal , setUserTotal] = useState('');
     const[roleID , setRoleID] = useState('');
     
     const[display , setDisplay] = useState(0);
@@ -31,15 +24,13 @@ const UserTimelineModal = ({ID,isShow,onHide}) => {
 
     const[therapistBookings , setTherapistBookings] = useState([]);
 
-    const[users , setUsers] = useState('');
 
-    const[lastBooking, setLastBooking] = useState('');
-    const[lastBookingStatusCode , setLastBookingStatusCode] = useState('');
+    const [therapistRevenue , setTherapistRevenue] = useState('');
 
-    const[bookingCounts , setBookingCounts] = useState('');
-    const[reviewsCounts , setReviewCounts] = useState('');
+    const[startingDate , setStartingDate] = useState('');
+    const[endingDate , setEndingDate] = useState('');
+  
 
-    const[prevAndBooking , setPrevBooking] = useState([]);
 
     
     function handleDisplay(val){
@@ -49,65 +40,6 @@ const UserTimelineModal = ({ID,isShow,onHide}) => {
           }, 1000);
     }
 
-
-    function gettingUsers(){
-      axios.post(`${process.env.REACT_APP_BASE_URL}fetchuserwithid/${ID}`)
-      .then((res)=>{
-        setUsers(res.data.data)
-      })
-      .catch((err)=>{
-        return err;
-      })
-    }
-
-
-    function gettingLastBooking(){
-        const userObj = {
-            user_id :ID
-        }
-        axios.post(`${process.env.REACT_APP_BASE_URL}getLastBookingDate`,userObj)
-        .then((res)=>{
-            if(res.data.status === "200"){
-                setLastBooking(res.data.last_booking_date)
-                setLastBookingStatusCode(res.data.status)
-            }
-        })
-        .catch((err)=>{
-        if(err.response.status === 401){
-            setLastBooking(err.response.data.message)
-            setLastBookingStatusCode(err.response.status)
-
-        }
-        })
-    }
-
-
-    function gettingBookingCounts(){
-        const userObj = {
-            user_id :ID
-        }
-        axios.post(`${process.env.REACT_APP_BASE_URL}getBookingCount`,userObj)
-        .then((res)=>{
-            setBookingCounts(res.data.booking_count)
-        })
-        .catch((err)=>{
-            return err;
-        })
-    }
-
-    function gettingReviewsCount(){
-        const userObj = {
-            user_id :ID
-        }
-        axios.post(`${process.env.REACT_APP_BASE_URL}getRatingsAndReviewsByUserId`,userObj)
-        .then((res)=>{
-            setReviewCounts(res.data.RatingsAndReviewsCount)
-        })
-        .catch((err)=>{
-            return err;
-        })
-
-    }
 
 
 
@@ -152,18 +84,20 @@ const UserTimelineModal = ({ID,isShow,onHide}) => {
       })
     }
 
-    function gettingPreviousAndUpcomingBookings(){
-      const bookingObj = {
-        user_id:ID
+    function gettingTherapistRevenue(){
+      const revenueObj = {
+        therapist_id:ID,
+        start_date:startingDate,
+        end_date:endingDate
       }
-      axios.post(`${process.env.REACT_APP_BASE_URL}fetch_bookings_userid`,bookingObj)
+      axios.post(`${process.env.REACT_APP_BASE_URL}getTherapistAmountwithdate`,revenueObj)
       .then((res)=>{
-        setPrevBooking(res.data.Bookings)
+        setTherapistRevenue(res.data.total_therapist_amount)
       })
       .catch((err)=>{
         return err;
       })
-      
+
     }
 
 
@@ -183,31 +117,67 @@ const UserTimelineModal = ({ID,isShow,onHide}) => {
     }
   }
 
+    const data ={
+       
+      datasets: [
+        {
+          data: [
+            therapistRevenue
+          ]
+          ,
+          backgroundColor:[
+            // '#7895CB',
+            // '#9F91CC',
+            // '#9ED2BE',
+            // '#6D5D6E',
+            '#9E9FA5'
+          ]
+      },
+    ]
+    
+    ,
+    labels: [
+  
+  
+        `From:${startingDate} - To:${endingDate}`,
+     
+    
+        
+    ]
+    
+    
+    
+  }
+  
+  const options = {
+    plugins: {
+      legend: {
+        labels: {
+          color: '#fff', // Set the desired label text color
+        },
+      },
+    },
+  };
+
     
 
 
     useEffect(() => {
         SetLocalLogin()
 
-        gettingUsers()
-        gettingLastBooking()
-        gettingBookingCounts()
-        gettingReviewsCount()
-
         gettingTherapistBookings()
         gettingTakenTherapistBookingCount()
         gettingRejectedTherapistBookingCount()
-        gettingPreviousAndUpcomingBookings()
     }, [])
+    
   return (
-    <>
-      <Modal isOpen={isShow} className="content-wrapper  user_modal">
+  <Modal isOpen={isShow} className="content-wrapper  user_modal">
   <div className="usermodal_height"  style={{ background: colorScheme.body_bg_color }}>
   <section className="content-header">
     <div className="container-fluid">
       <div className="row mb-2">
         <div className="col-sm-6">
-          <h1> User Timeline</h1>
+          <h1> Therapist Timeline</h1>
         </div>  
         <div className="col-sm-6">
           <ol className="breadcrumb float-sm-right">
@@ -244,13 +214,13 @@ const UserTimelineModal = ({ID,isShow,onHide}) => {
               <span className="btn btn-outline-primary btn-sm float-right" onClick={()=>handleDisplay(0)}><i className="fa-solid fa-arrow-up fa-1x"></i></span>
 
               }
-              <h3 className="timeline-header text-white">User's Activation</h3>
+              <h3 className="timeline-header text-white">Therapist Info</h3>
               {
                 display !== 1 ? null:
               <div className="timeline-body">
                <div className="row">
                   <div className="col-lg-12 text-center">
-                    <h4>Last Active: <br /><Moment date={users.updated_at} format="YYYY/MM/DD"/></h4>
+                   <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Sint, vel repellat! Sit delectus asperiores autem sapiente vero earum at est id ea.</p>
                   </div>
 
                </div>
@@ -264,6 +234,10 @@ const UserTimelineModal = ({ID,isShow,onHide}) => {
               {/* UserInfo Card */}
 
             </div>
+
+
+
+
                   
             <div>
               <i className="fas fa-money-bill-transfer bg-white" />
@@ -275,21 +249,22 @@ const UserTimelineModal = ({ID,isShow,onHide}) => {
               <span className="btn btn-outline-primary btn-sm float-right" onClick={()=>handleDisplay(0)}><i className="fa-solid fa-arrow-up"></i></span>
 
               }
-                <h3 className="timeline-header text-white">Latest Booking</h3>
+                <h3 className="timeline-header text-white">Total Orders</h3>
               {
                  display !== 2 ? null:
                 <div className="timeline-body">
                  <div className="row">
-                 <div className="col-lg-12 text-center">
-                    {
-                        lastBookingStatusCode === "200"?
-                        <h4>Last Booking: <br /><Moment date={lastBooking} format="YYYY/MM/DD"/></h4>
-                        :
-                        <h4>No Dates Found</h4>
-                    }   
-           
-                  </div>
-                </div>
+              
+                      <div className="col-lg-6 p-2">
+                      <li style={{listStyle:"none"}}>Total taken orders:&nbsp;<b>{therapisTakenBookingCount.count}</b> </li>
+                      </div>
+
+                      <div className="col-lg-6 p-2">
+                      <li style={{listStyle:"none"}}>Total Rejected orders:&nbsp;<b>{therapistRejectedBookingCount.count}</b> </li>
+                      </div>
+                    </div>
+        
+          
                 </div>
 
                 }
@@ -311,18 +286,42 @@ const UserTimelineModal = ({ID,isShow,onHide}) => {
               <span className="btn btn-outline-primary btn-sm float-right" onClick={()=>handleDisplay(0)}><i className="fa-solid fa-arrow-up"></i></span>
 
               }
-                <h3 className="timeline-header text-white">Total Bookings</h3>
+                <h3 className="timeline-header text-white">Booking Information</h3>
                 {
                 display !== 3 ? null:
                 <div className="timeline-body">
-                <div className="row">
-                <div className="col-lg-12 text-center">
-                    {
-                        <h4>Total Bookings:{bookingCounts}</h4>
+          
+                {
+                  therapistBookings && therapistBookings.length > 0 ?
+                 <div className="row">
+                  {
+                   therapistBookings.map((items,index)=>{
+                    return(
+                      <div key={index+1} className="col-lg-6">
+                      <li className="mb-3" style={{listStyle:"none"}}>Booking No:&nbsp;<b>{index+1}</b></li>
+                      <li>Therapist Name:&nbsp;<b>{items.therapist_name}</b> </li>
+                      <li>Categories: &nbsp;<b>{items.category_name.map((category)=>{
+                        return(
+                            <li>{category}</li>
+                        )
+                      })}</b> </li>
+                      <li>Address: &nbsp;&nbsp; {items.address}</li>
+                      <li>Price:&nbsp;<b>{items.price}</b> </li>
+       
+                      <li>Time:&nbsp;<b>{items.time}</b> </li>
+                      <li>Duration:&nbsp;<b>{items.duration}</b> </li>
+                      <li>Status:&nbsp;<b>{items.status}</b> </li>
+                      <li style={{listStyle:"none"}}> <i className="fas fa-calendar-days"/>&nbsp;&nbsp;&nbsp;<b>{items.date}</b></li> 
 
-                    }
-                </div>
-                </div>
+
+                      </div>
+                    )
+                })
+              }
+                 </div>
+                 :
+                 <h3 className="text-center">No Bookings Found!</h3>
+               }
 
                 </div>
                }
@@ -331,7 +330,7 @@ const UserTimelineModal = ({ID,isShow,onHide}) => {
             </div>
 
             <div>
-              <i className="fas fa-star bg-white" />
+              <i className="fas fa-money-bill-wave bg-white" />
               <div className="timeline-item"  style={{background: colorScheme.card_bg_color,color: colorScheme.card_txt_color}}>
               {
                   display !== 4 ? 
@@ -340,28 +339,55 @@ const UserTimelineModal = ({ID,isShow,onHide}) => {
               <span className="btn btn-outline-primary btn-sm float-right" onClick={()=>handleDisplay(0)}><i className="fa-solid fa-arrow-up"></i></span>
 
               }
-                <h3 className="timeline-header text-white">Total Reviews</h3>
+                <h3 className="timeline-header text-white">Therapist Revenue Chart</h3>
                 {
                   display !== 4 ? null:
                 <div className="timeline-body">
-                   <div className="timeline-body">
-                <div className="row">
-                <div className="col-lg-12 text-center">
-                    {
-                        <h4>Total Reviews:{reviewsCounts}</h4>
+                  <div className="row"> 
+                  <div className="col-lg-4 col-sm-12">
+                        <div className="form-group">
+                      <label htmlFor="exampleInputPassword2">Starting date*</label>
+                      <input type="date"  className="form-control form-control-sm" id="exampleInputPassword2" onChange={(e)=> setStartingDate(e.target.value)} style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
+                    </div>
+                    </div>
 
-                    }
-                </div>
-                </div>
+                           
+                    <div className="col-lg-4 col-sm-12">
+                        <div className="form-group">
+                      <label htmlFor="exampleInputPassword3">Ending Date*</label>
+                      <input type="date" className="form-control form-control-sm" id="exampleInputPassword3" onChange={(e)=> setEndingDate(e.target.value)}    style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
+                    </div>
+                    </div>
+                    
+                    <div className="col-lg-4 col-sm-12 " style={{marginTop:"1.9em"}}>
+                    <button className="btn btn-outline-info btn-sm" onClick={gettingTherapistRevenue}>check</button>
+                      </div>
+                  </div>
 
-                </div>
+                {/* {
+                  userWithdrawal.length !== 0 ? */}
+                 <div className="row">
+                  <div className="col-lg-12">
+                    <div className="card" style={{background: colorScheme.card_bg_color,color: colorScheme.card_txt_color,boxShadow: colorScheme.box_shadow_one}}>
+                      <div className="card-body">
+                      <div className="chart w-50 d-block mx-auto">
+                      <Doughnut  data={data} options={options} />
+                      </div>
+                      </div>
+                    </div>
+
+                  </div>
+                 </div>
+                 {/* :
+                 <h3 className="text-center">No Withdrawals!</h3>
+               } */}
 
                 </div>
                 }
               </div>
             </div>
 
-            <div>
+            {/* <div>
               <i className="fas fa-people-group bg-white" />
               <div className="timeline-item"  style={{background: colorScheme.card_bg_color,color: colorScheme.card_txt_color}}>
               {
@@ -371,48 +397,34 @@ const UserTimelineModal = ({ID,isShow,onHide}) => {
               <span className="btn btn-outline-primary btn-sm float-right" onClick={()=>handleDisplay(0)}><i className="fa-solid fa-arrow-up"></i></span>
 
               }
-                <h3 className="timeline-header text-white">Previous & Upcoming Bookings</h3>
+                <h3 className="timeline-header text-white">Teams</h3>
                 {
                     display !== 5 ? null:
                 <div className="timeline-body">
+
+                  <h3 className="ml-2 text-center text-danger"> <b>"Team One"</b></h3>
                 {
-                 prevAndBooking &&  prevAndBooking.length > 0 ?
+                  userTeamOne.length !== 0 ?
                  <div className="row p-3">
                   {
-                    prevAndBooking.map((items,index)=>{
+                    userTeamOne.map((items,index)=>{
                       return(
                         <div key={index+1} className="col-lg-4">
-                      <li className="m-3 text-warning" style={{listStyle:"none", fontSize:"1.5em"}}>Booking# <b>{index+1}</b> </li>
+                      <li className="m-3 text-warning" style={{listStyle:"none", fontSize:"1.5em"}}>User# <b>{index+1}</b> </li>
                       <li>Username:&nbsp;<b>{items.username}</b> </li>
-                      <li>Therapist Name:&nbsp;<b>{items.therapist_name}</b> </li>
-                      <li>Time:&nbsp;<b>{items.time}</b> </li>
+                      <li>First Name:&nbsp;<b>{items.firstname}</b> </li>
+                      <li>Last Name:&nbsp;<b>{items.lastname}</b> </li>
 
-                      <li>Price:&nbsp;<b>{items.price}</b> </li>
-                      <li>Address:&nbsp;<b> <ReadMoreReact
-                                  text={
-                                      items.address
-                                  }
-                                  min={10}
-                                  ideal={20}
-                                  max={50}
-                                  readMoreText="...Read More"
-                                />   
-                                </b> 
-                      </li>
+                      
+                      <li>Referral Code:&nbsp;<b>{items.referal_code}</b> </li>
+                      <li>Level:&nbsp;<b>{items.level}</b> </li>
+                      <li>Email:&nbsp;<b>{items.email}</b></li>
+                      <li>Phone:&nbsp;<b>{items.phone}</b></li>
+                      <li>Cnic:&nbsp;<b>{items.cnic}</b> </li>
 
-                      <li>Duration:&nbsp;<b>{items.duration}</b> </li>
-                     {
-                        items.status === "In_progress" ?
-                        <li>Status:&nbsp;<b  className="text-primary">{items.status}</b> </li>
-                        :
-                        items.status === "Completed" ?
-                        <li  >Status:&nbsp;<b className="text-success">{items.status}</b> </li>
-                        :
-                        <li  >Status:&nbsp;<b className="text-warning">{items.status}</b> </li>
+                      <li>Question:&nbsp;<b>{items.question}</b></li>
+                      <li>Answer:&nbsp;<b>{items.answer}</b> </li>
 
-
-                                          
-                      }
                       <li style={{listStyle:"none"}}> <i className="fas fa-calendar-days"/>&nbsp;&nbsp;<b>{items.Idate}</b></li> 
 
                       <li style={{listStyle:"none"}}> <i className="fas fa-clock"/>&nbsp;&nbsp;&nbsp;<b><Moment date={items.updated_at} format="hh:mm:ss"/></b></li>
@@ -423,7 +435,7 @@ const UserTimelineModal = ({ID,isShow,onHide}) => {
 
                  </div>
                  :
-                 <h3 className="text-center">No Booking Found!</h3>
+                 <h3 className="text-center">No Team Found!</h3>
           
                }
 
@@ -431,7 +443,7 @@ const UserTimelineModal = ({ID,isShow,onHide}) => {
                 </div>
                 }
               </div>
-            </div>
+            </div> */}
      
       
 
@@ -451,7 +463,6 @@ const UserTimelineModal = ({ID,isShow,onHide}) => {
 
  </div> 
     </Modal>
-    </>
   )
 }
 

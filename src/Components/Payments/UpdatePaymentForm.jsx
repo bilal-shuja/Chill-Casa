@@ -1,8 +1,8 @@
 import {useLocation , useNavigate} from 'react-router-dom';
+import React,{useState, useEffect} from 'react';
 import "react-toastify/dist/ReactToastify.css";
 import colorScheme from '../Colors/Styles.js';
 import { toast } from "react-toastify";
-import React,{useState, useEffect} from 'react';
 import axios from 'axios';
 
 const UpdatePaymentForm = () => {
@@ -24,7 +24,7 @@ const UpdatePaymentForm = () => {
     const[jazzCashTitle , setJazzCashTitle] = useState('');
     const[jazzCashNo , setJazzCashNo] = useState('');
 
-    const[easyPaisaTitle , setEasyPaisaTitle] = useState('')
+    const[easyPaisaTitle , setEasyPaisaTitle] = useState('');
     const[easyPaisaNo , setEasyPaisaNo] = useState('');
 
 
