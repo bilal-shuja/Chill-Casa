@@ -1,4 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation , useParams } from "react-router-dom";
+import usersEndPoint from '../Api/UserEndPoint.js';
 import React, { useState, useEffect } from "react";
 import userEndPoint from "../Api/UserEndPoint.js";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,8 +13,11 @@ import axios from "axios";
 import "moment-timezone";
 
 const UserProfile = () => {
-  const location = useLocation();
-  const { ID } = location.state;
+  const {mutate:postAdminComments} = usersEndPoint.useAdminComment();
+
+  // const location = useLocation();
+  // const { ID } = location.state;
+  const { ID } = useParams();
 
   const [userProfile, setUserProfile] = useState("");
   const [bookingCounts, setBookingCounts] = useState("");
@@ -28,6 +32,7 @@ const UserProfile = () => {
   const [therapistComment, setTherapistComment] = useState([]);
 
   const [fetchingAdminNotes, setFetchingAdminNotes] = useState([]);
+  const[adminComments , setAdminComments] = useState('');
 
   const [index, setIndex] = useState("");
 
@@ -230,6 +235,17 @@ formdata.append("password", password);
     });
   }
 
+  function submitAdminComments(){
+    alert(ID)
+    const adminCommentObj = {
+      user_id:ID,
+      see_note:adminComments
+    }
+    postAdminComments(adminCommentObj)
+    setAdminComments(" ")
+
+  }
+
   useEffect(() => {
     gettingUserLogins();
     gettingUserBookings();
@@ -275,6 +291,15 @@ formdata.append("password", password);
                       boxShadow: colorScheme.box_shadow_one,
                     }}
                   >
+                       <div className="col-lg-4 ">
+                      <Link
+                        className="btn btn-outline-info btn-sm"
+                        to="/UpdateUserForm"
+                        state={{ ID: ID }}
+                      >
+                        <i className="fa-solid fa-pen-to-square"></i>
+                      </Link>
+                    </div>
                     <div className="card-body">
                       <div className="text-center">
                         {userProfile.profile_pic === "default" ? (
@@ -299,10 +324,7 @@ formdata.append("password", password);
                       <p className="text-center mt-4">Chill Casa Co.</p>
 
                       <div className="text-center">
-                        {/* <button className="btn btn-info col-4" onClick={()=>{
-                      SendNotification("userID","Withdrawal Rejection", "queryOne")
-                      }}>Follow</button>&nbsp;&nbsp;
-                    <button className="btn btn-outline-info col-4">Message</button> */}
+     
                         {userProfile.type_of_client === "tourist" ? (
                           <button className="btn btn-info col-4">
                             {userProfile.type_of_client}
@@ -347,7 +369,6 @@ formdata.append("password", password);
                           <i className="fa-solid fa-envelope fa-2x"></i>
                         </div>
                         <div className="col-sm-9 d-flex align-self-center">
-                          {/* <h5 class=" mb-0">{mem.email}</h5> */}
                           <h5 class=" mb-0">{userProfile.email}</h5>
                         </div>
                       </div>
@@ -380,8 +401,23 @@ formdata.append("password", password);
                         </div>
                         <div className="col-sm-9 d-flex align-self-center">
                           <h5 class=" mb-0">{userProfile.residence_address}</h5>
+                          &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+                          &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+                          &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+                          &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+                          &nbsp; &nbsp; &nbsp;
+
+                          <Link
+                        className="btn btn-outline-info btn-sm"
+                        to="/UpdateUserForm"
+                        state={{ ID: ID }}
+                      >
+                        <i className="fa-solid fa-pen-to-square"></i>
+                      </Link>
                         </div>
+
                       </div>
+
                     </div>
                   </div>
                   <div className="d-flex justify-content-between p-3">
@@ -391,8 +427,15 @@ formdata.append("password", password);
                       data-target="#staticBackdrop"
                     >
                       Booking Management
-                    </button>{" "}
-                    &nbsp;&nbsp;
+                    </button>
+                      &nbsp; &nbsp;
+                    <button type="button" className="btn btn-outline-primary col-lg-4 p-3 rounded" data-toggle="modal" data-target="#exampleModal"
+                    data-bs-placement="left" title="admin comments"
+                    
+                    >
+                    Admin Comments
+                  </button>
+                  &nbsp;
                     <button
                       className="btn btn-outline-primary col-lg-4 p-3 rounded"
                       data-toggle="modal"
@@ -400,6 +443,8 @@ formdata.append("password", password);
                     >
                       Login Management
                     </button>
+
+                    {/*  */}
                   </div>
                 </div>
 
@@ -628,7 +673,7 @@ formdata.append("password", password);
                                     <div className="d-flex justify-content-center">
                                       <Link
                                         className="btn btn-outline-info btn-sm"
-                                        to="/UpdateTherapistComment"
+                                        to={`/UpdateTherapistComment/${ID}`}
                                         state={{
                                           ID: items.id,
                                           TherapistComment: items.comment,
@@ -711,7 +756,7 @@ formdata.append("password", password);
                                     <div className="d-flex justify-content-center">
                                       <Link
                                         className="btn btn-outline-info btn-sm"
-                                        to="/UpdateAdminNote"
+                                        to={`/UpdateAdminNote/${ID}`}
                                         state={{
                                           ID: items.id,
                                           Note: items.see_note,
@@ -1007,6 +1052,30 @@ formdata.append("password", password);
 
             {/* Login Management Modal */}
 
+
+                              
+                {/*Query Modal Start  */}
+                
+                <div className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" >
+              <div className="modal-dialog" >
+                <div className="modal-content" style={{background:colorScheme.card_bg_color,color:colorScheme.card_txt_color}}>
+                  <div className="modal-header">
+                    <h5 className="modal-title" id="exampleModalLabel" style={{color:colorScheme.card_txt_color}}>Write Comments</h5>
+                    <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true"  style={{color:colorScheme.card_txt_color}}>&times;</span>
+                    </button>
+                  </div>
+                  <div className="modal-body">
+                    <textarea type="text" className="form-control" value={adminComments} placeholder="Writer your comments here..." row={6} style={{background:colorScheme.card_bg_color,color:colorScheme.card_txt_color}} onChange={(e)=>setAdminComments(e.target.value)}/>
+                    
+                  </div>
+                  <div className="modal-footer">
+                    <button type="button" className="btn btn-outline-info btn-sm" onClick={submitAdminComments}>Submit</button>
+                  </div>
+                </div>
+              </div>
+             </div>
+                {/* Query Modal End */}
           </section>
         </div>
       </div>

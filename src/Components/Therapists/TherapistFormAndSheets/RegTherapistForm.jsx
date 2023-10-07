@@ -24,7 +24,6 @@ const RegTherapistForm = () => {
     
     const[password , setPassword] = useState('');
     const[profileImg , setProfileImg] = useState(null);
-    const[postCode, setPostCode] = useState('');
 
     const[titleOne , setTitleOne] = useState('');
     const[qualificationImageOne , setQualificationImageOne] = useState(null);
@@ -214,32 +213,32 @@ useEffect(() => {
 
 
     
-    // setFirstName('');
-    // setLastName('');
-    // setEmail('');
-    // setPassword('');                    
-    // setAddress('');
-    // setGender('');
-    // setPhone('');
+    setFirstName('');
+    setLastName('');
+    setEmail('');
+    setPassword('');                    
+    setAddress('');
+    setGender('');
+    setPhone('');
 
-    // setProfileImg(null);
+    setProfileImg(null);
     // setSelectCategoryID('');
-    // setSelectCategoryOptions('');
-    // setSelectedCategoryOptions('');
+    setSelectCategoryOptions('');
+    setSelectedCategoryOptions('');
 
-    // setPostCodeCategory('')
-    // setSelectedPostCodeValues('');
-    // setSelectedPostCodeAddress('');
+    setPostCodeCategory('')
+    setSelectedPostCodeValues('');
+    setSelectedPostCodeAddress('');
 
-    //  setTitleOne('')
-    //  setTitleTwo('')
-    //  setTitleThree('')
+     setTitleOne('')
+     setTitleTwo('')
+     setTitleThree('')
 
-    // setQualificationImageOne(null);
-    // setQualificationImageTwo(null);
-    // setQualificationImageThree(null);
+    setQualificationImageOne(null);
+    setQualificationImageTwo(null);
+    setQualificationImageThree(null);
 
-    // formRef.current.reset();
+    formRef.current.reset();
 
 
   }

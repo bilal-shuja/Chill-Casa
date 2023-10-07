@@ -150,11 +150,6 @@ const Sidebar = () => {
                         </Link>
                       </li>
 
-                      
-                    {roleID === "1" || roleID === "6" ? (
-                      null
-                      
-                    ) : null}
 
 
 
@@ -207,7 +202,7 @@ const Sidebar = () => {
                     <li className="nav-item">
                         <Link to="/TherapistCategorySheet" className="nav-link ">
                           <i className="far fa-circle nav-icon" />
-                          <p>Massages Sheet</p>
+                          <p>Type of Services</p>
                         </Link>
                     </li>
                     </ul>

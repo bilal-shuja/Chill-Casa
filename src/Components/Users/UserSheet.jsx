@@ -8,8 +8,6 @@ import ReadMoreReact from 'read-more-react';
 import {Link} from 'react-router-dom';
 import {toast} from "react-toastify";
 import {useQuery} from 'react-query';
-import Moment from 'react-moment';
-import 'moment-timezone';
 import axios from 'axios';
 
 
@@ -66,6 +64,8 @@ const UserSheet = () => {
   }
    )
 
+
+
    const totalResults = count|| 0;
    const startResult = (pages - 1) * resultsPerPage + 1;
    const endResult = Math.min(pages * resultsPerPage, totalResults);
@@ -74,20 +74,6 @@ const UserSheet = () => {
   
 
 
-
-
-    // function deleteMembers(id){
-    //   axios.post(`${process.env.REACT_APP_BASE_URL}deleteuserwithid/${id}`)
-    //   .then((res)=>{
-    //       toast.error("User Deleted!" , {theme:"dark"})
-    //       setTimeout(() => {
-    //         window.location.reload(true)
-    //       }, 3000);
-    //       })
-    //   .catch((res)=>{
-    //     toast.warn("Something went wrong" , {theme:"dark"})
-    //   })
-    // }
 
 
     function suspendUser(id){
@@ -202,53 +188,18 @@ function UserList ({items,index}){
     </Link>&nbsp;&nbsp;
 
 
-    <Link className="btn btn-outline-info btn-sm"  data-bs-toggle="tooltip" data-bs-placement="left" title="user profile"  to="/UserProfile" state={{ID:items.id}}>
+    <Link className="btn btn-outline-info btn-sm"  data-bs-toggle="tooltip" data-bs-placement="left" title="user profile"  to={`/UserProfile/${items.id}`} state={{ID:items.id}}>
       <i className="fa fa-user"></i>
     </Link>&nbsp;&nbsp; 
-{/* 
-    <button className="btn btn-outline-primary btn-sm" data-bs-toggle="tooltip" data-bs-placement="left" title="user timeline" onClick={ ()=>{
-      setShowUserModal(true)
-      }}>
-      <i className="fa-solid fa-timeline"></i>
-    </button> */}
-
-
-    
-{/*     
-    <button className="btn btn-outline-primary btn-sm" onClick={ ()=>{
-      
-      setShowUserModal(true)
-      
-      }}>
-      <i className="fa-solid fa-timeline"></i>
-    </button> */}
-
-    {/* <Link className="btn btn-outline-primary btn-sm" to="/TimeLine" state={{ID:items.id, target:"/UserSheet"}}>
-      <i className="fa-solid fa-timeline"></i>
-    </Link> */}
-
-    {/* &nbsp;&nbsp;
-
-    <button className="btn btn-outline-danger btn-sm"
-    onClick={()=> {setShow(true)}}
-      >
-      <i className="fa fa-user-minus"></i>
-    </button>  */}
-
-    {/* &nbsp;&nbsp;
-
-  <button className="btn btn-outline-danger btn-sm" onClick={()=>deleteMembers(items.id)}>
-      <i className="fa fa-trash"></i>
-    </button> */}
     </>
 
   &nbsp;&nbsp;
-    <button type="button" className="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#exampleModal"
+    {/* <button type="button" className="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#exampleModal"
     data-bs-placement="left" title="admin comments"
     onClick={()=>{setUserID(items.id)}}
     >
     <i className="fa-solid fa-paperclip"></i>
-  </button>
+  </button> */}
 
     
   </div>
@@ -448,7 +399,7 @@ function UserList ({items,index}){
                         <button className="btn btn-outline-light btn-sm" onClick={handleNextPage} disabled={totalResults <= endResult}>
                           <i className="fa-solid fa-arrow-right"></i>
                         </button>
-                        <p >Showing {startResult} - {endResult} of {filteredCount} results</p>
+                        <p >Showing {startResult} - {endResult} of {filteredCount} results - total :&nbsp;&nbsp;{count}</p>
                         
                             </div>
                           </div>

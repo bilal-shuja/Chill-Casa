@@ -3,6 +3,7 @@ import React,{useState,useRef,useEffect} from 'react';
 import colorScheme from '../../Colors/Styles.js';
 import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
+import Select from 'react-select';
 import axios from 'axios';
 
 
@@ -17,17 +18,22 @@ const UpdateTherapist = () => {
     const[therapistID , setTherapistID] = useState(ID)
 
     // Therapist Form Hooks:
-    const[multiPostcode , setMultiPostcode ] = useState('');
-    const[multiPostcodeRegion , setMultiPostcodeRegion] = useState('')
 
     const[address , setAddress] = useState('');
     const[postCode, setPostCode] = useState('');
     const[postcodeRegion , setPostcodeRegion] = useState('');
 
+    const[postCodeForHook , setPostCodeForHook] = useState(postCode);
+    const[postCodeForRegHook , setPostCodeForRegHook] = useState(postcodeRegion);
+
     const[profileImg , setProfileImg] = useState('');
     const[showprofileImg , setShowProfileImg] = useState('');
 
-
+        // Selecting multi Postcode hooks:
+    const[therapistPostcode , setTherapistPostCode] = useState([]);
+    const[selectPostcodeCategory , setPostCodeCategory] = useState([]);
+    const[selectedPostcodeValues , setSelectedPostCodeValues] = useState([]);
+    const[selectedPostcodeAddress , setSelectedPostCodeAddress] = useState([]);
 
     const[titleOne , setTitleOne] = useState('');
     const[qualificationImageOne , setQualificationImageOne] = useState('');
@@ -49,25 +55,60 @@ const UpdateTherapist = () => {
     const[loading , setLoading] = useState(false);
 
 
-    const handlePostcodeInputChange = (e)=>{
-      setMultiPostcode(e.target.value)
+    
+    //  Getting All Postcode function:
 
+    const   gettingPostCode = async ()=>{     
+      
+     await axios.post(`${process.env.REACT_APP_BASE_URL}fetch_location`)
+      .then((res)=>{
+        setTherapistPostCode(res.data.Location)
+        gettingIndviTherapist(res.data.Location)
+
+      })
+      .catch((err)=>{
+        return err;
+      })
+      
+      }
+  
+
+    // Custom Colors integration in Select:
+    const customStyles = {
+      option: (base, { data, isDisabled, isFocused, isSelected }) => {
+      return {
+        ...base,
+        backgroundColor: isSelected ? colorScheme.card_bg_color: isFocused ?colorScheme.card_bg_color :colorScheme.card_txt_color,
+        color: isFocused? "#fff":"black",
+        borderColor: isFocused ?colorScheme.card_bg_color : 'gray',
+      };
+    }
     }
 
-    const hanldeRegionInputChange = (e)=>{
-      setMultiPostcodeRegion(e.target.value)
+   // Multiple Postcode input functions:
+  const handlePostcodeInputChange = (selectedValues)=>{
+    setPostCodeCategory(selectedValues);
+    const selectedPostcodeValues = selectedValues.map((item) => item.value);
+    setSelectedPostCodeValues(selectedPostcodeValues)
+    const selectedPostcodeAddress = selectedValues.map((item) => item.label);
+    setSelectedPostCodeAddress(selectedPostcodeAddress)
+  }
 
-    }
+// Getting postcodes:
+  const postcodeOption = therapistPostcode.map((item) => ({
+    value: item.postcode,
+    label: item.address,
+  })
+  );
 
     // Filling up input fields function:
 
-    function gettingIndviTherapist(){
+    function gettingIndviTherapist(poscodeLoc){
         axios.post(`${process.env.REACT_APP_BASE_URL}fetchtherapistwithid/${ID}`)
         .then((res)=>{
           setAddress(res.data.data.address)
           setPostCode(res.data.data.postcode)
           setPostcodeRegion(res.data.data.postcode_address)
-
           setShowProfileImg(res.data.data.image)
           setShowQualificationImageOne(res.data.data.image1)
           setShowQualificationImageTwo(res.data.data.image2)
@@ -77,44 +118,38 @@ const UpdateTherapist = () => {
           setTitleTwo(res.data.data.image2_name)
           setTitleThree(res.data.data.image3_name)
 
-          
-      
-  
+
         })
         .catch((error)=>{
           return null;
         })
     }
 
+
     // Updating function for postcode of therapist:
     function updateTherapistPostCode(e){
       e.preventDefault();
       setLoading(true)
-      const postcodeArray = multiPostcode.split(",").map((value)=> value.trim());
-      const postcodeRegionArray = multiPostcodeRegion.split(",").map((value)=> value.trim());
         
-      var formdata = new FormData();
+      let formdata = new FormData();
 
-      
       address &&
       formdata.append("address",address);
-      if (multiPostcode) {
-        const postcodeArray = multiPostcode.split(",").map((value) => value.trim());
-        formdata.append("postcode", postcodeArray);
+      if (selectedPostcodeValues && selectedPostcodeValues.length > 0) {
+        formdata.append("postcode", selectedPostcodeValues);
       }
       else{
-        postCode &&
-        formdata.append("postcode",postCode);
+        postCodeForHook &&
+        formdata.append("postcode",postCodeForHook.join(","));
       }
 
 
-      if (multiPostcodeRegion) {
-        const postcodeRegionArray = multiPostcodeRegion.split(",").map((value) => value.trim());
-        formdata.append("postcode_address", postcodeRegionArray);
+      if (selectedPostcodeAddress && selectedPostcodeAddress.length >0) {
+        formdata.append("postcode_address", selectedPostcodeAddress);
       }
       else{
-        postcodeRegion && 
-        formdata.append("postcode_address",postcodeRegion);
+        postCodeForRegHook &&
+        formdata.append("postcode_address",postCodeForRegHook.join(","));
       }
 
 
@@ -167,12 +202,12 @@ const UpdateTherapist = () => {
 
 
 
-
-
+  
 
 
   useEffect(() => {
-    gettingIndviTherapist()
+    gettingPostCode()
+
   }, [])
   
   return (
@@ -200,7 +235,7 @@ const UpdateTherapist = () => {
           <div className="card" style={{background:colorScheme.card_bg_color,color:colorScheme.card_txt_color, boxShadow:colorScheme.box_shadow_one}}>
             <div className="card-header">
             Update Therapist Form
-            {/* <h5 className="align-items-center mt-1 text-bold">Your referral code &nbsp;&nbsp;"{referCode}"</h5> */}
+        
             </div>
             {/* /.card-header */}
             
@@ -209,50 +244,6 @@ const UpdateTherapist = () => {
 
               <div className="card-body">
                 <div className="row">
-                    {/* <div className="col-lg-4 col-sm-12">
-                    <div className="form-group">
-                        <label htmlFor="exampleInputEmail1">Select Category*</label>
-                        <Select 
-                        placeholder="Select category"
-                            styles={customStyles}
-                            isSearchable={true}
-                            isMulti
-                            options={options}
-                            value={selectCategoryOptions}
-                            onChange={handleOptionChange}
-
-                        >
-
-                        </Select> */}
-
-                        {/* <select  className={selectCategory === ''&& input === true?"form-control border border-danger":"form-control"}
-                            style={{
-                              background: colorScheme.card_bg_color,
-                              color: colorScheme.card_txt_color,
-                              }}
-                              onChange={handleSelectChange}
-                              value={selectCategory}
-                              >
-                                {
-                                  category.length === 0 ?
-                                  <option value="">--- No Category Found ---</option>
-                                  :
-                                  category.map((options,index)=>{
-                                    const optionValue = `${options.id},${options.title}`;
-                                    const isSelected = options.id === categoryID;
-                                    return(
-                                      <option key={index} value={optionValue}>
-                                        {isSelected ? options.title : ''}
-                                     </option>
-                                    )
-                                  })
-                                }
-                          
-
-                          </select> */}
-                    {/* </div>
-                    
-                    </div> */}
                     
                     <div className="col-lg-4 col-sm-12">
                     <div className="form-group">
@@ -263,22 +254,34 @@ const UpdateTherapist = () => {
                     </a>
                 </div>
                     </div>
-
+                  
+                                              
+                <div className="col-lg-4 col-sm-12">
+                    <div className="form-group">
+                  <label htmlFor="exampleInputPassword11">Existing Postcode*</label>
+                  <input type="text" name="postcodeRegion" defaultValue={postcodeRegion} className={"form-control"} id="exampleInputPassword11"   placeholder="Enter Region" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
+                </div>
+                </div>
                     
                 <div className="col-lg-4 col-sm-12">
                     <div className="form-group">
-                  <label htmlFor="exampleInputPassword8">Post Code*</label>
-                  <input type="text" name="postcode" defaultValue={postCode} className={"form-control"} id="exampleInputPassword8"  onChange={handlePostcodeInputChange} placeholder="Enter PostCode" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
+                  <label htmlFor="exampleInputEmail1">Select Postcodes*</label>
+                  <Select 
+                        placeholder="Select postcode"
+                            styles={customStyles}
+                            isSearchable={true}
+                            isMulti
+                            options={postcodeOption}
+                            value={selectPostcodeCategory}
+                            onChange={handlePostcodeInputChange}
+
+                        >
+                  </Select>
+                
                 </div>
                 </div>
 
-                            
-                <div className="col-lg-4 col-sm-12">
-                    <div className="form-group">
-                  <label htmlFor="exampleInputPassword11">Regions*</label>
-                  <input type="text" name="postcodeRegion" defaultValue={postcodeRegion} className={"form-control"} id="exampleInputPassword11"  onChange={hanldeRegionInputChange} placeholder="Enter Region" style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} />
-                </div>
-                </div>
+
 
 
                 </div>

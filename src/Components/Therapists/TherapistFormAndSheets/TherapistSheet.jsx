@@ -125,10 +125,181 @@ const TherapistSheet = () => {
       ? therapists.filter((items) => items.gender === gender)
       : 
       firstname === "" && lastName === ""&& email === "" && contact === "" &&  postcode !== "" && date === "" && gender === "" && status === "" 
-      ? therapists.filter((items) =>items.postcode.includes(postcode))
+      ? therapists.filter((items) => items.postcode.includes(postcode))
       : 
       firstname === "" && lastName === ""&& email === "" && contact === "" &&  (status !== "" || status === "All") && date === "" && gender === "" && postcode === ""
       ? therapists.filter((items) => items.status === status)
+      :
+      
+      (firstname !== "" && lastName !== "") && email === "" && contact === "" && date === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.firstname === firstname && items.lastname === lastName) )
+      :
+      (firstname !== "" && email !== "") && lastName === "" && contact === "" && date === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.firstname === firstname && items.email === email) )
+      :
+      (firstname !== "" && contact !== "") && lastName === "" && email === "" && date === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.firstname === firstname && items.phone_number === contact) )
+      :
+      (firstname !== "" && date !== "") && lastName === "" && email === "" && contact === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.firstname === firstname && items.Idate === date) )
+      :
+      (firstname !== "" && gender !== "") && lastName === "" && email === "" && contact === ""&& date === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.firstname === firstname && items.gender === gender) )
+      :
+      (firstname !== "" && status !== "") && lastName === "" && email === "" && contact === ""&& date === "" && postcode === "" && gender === "" 
+      ? therapists.filter((items) =>  (items.firstname === firstname && items.status === status) )
+      :
+      (firstname !== "" && postcode !== "") && lastName === "" && email === "" && contact === ""&& date === "" && postcode === "" && gender === "" 
+      ? therapists.filter((items) =>  (items.firstname === firstname && items.postcode.includes(postcode)))
+      :
+
+      (lastName !== "" && firstname !== "") && email === "" && contact === "" && date === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.lastname === lastName && items.firstname === firstname) )
+      :
+      (lastName !== "" && email !== "") && firstname === "" && contact === "" && date === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.lastname === lastName && items.email === email) )
+      :
+      (lastName !== "" && contact !== "") && firstname === "" && email === "" && date === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.lastname === lastName && items.phone_number === contact) )
+      :
+      (lastName !== "" && date !== "") && firstname === "" && email === "" && contact === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.lastname === lastName && items.Idate === date) )
+      :
+      (lastName !== "" && gender !== "") && firstname === "" && email === "" && contact === ""&& date === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.lastname === lastName && items.gender === gender) )
+      :
+      (lastName !== "" && status !== "") && firstname === "" && email === "" && contact === ""&& date === "" && postcode === "" && gender === "" 
+      ? therapists.filter((items) =>  (items.lastname === lastName && items.status === status) )
+      :
+      (lastName !== "" && postcode !== "") && firstname === "" && email === "" && contact === ""&& date === "" && status === "" && gender === ""
+      ? therapists.filter((items) =>  (items.lastname === lastName && items.postcode.includes(postcode)))
+
+      :
+      (email !== "" && firstname !== "") && email === "" && contact === "" && date === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.email === email && items.firstname === firstname) )
+      :
+      (email !== "" && lastName !== "") && firstname === "" && contact === "" && date === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.email === email && items.lastname === lastName) )
+      :
+      (email !== "" && contact !== "") && firstname === "" && lastName === "" && date === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.email === email && items.phone_number === contact) )
+      :
+      (email !== "" && date !== "") && firstname === "" && lastName === "" && contact === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.email === email && items.Idate === date) )
+      :
+      (email !== "" && gender !== "") && firstname === "" && lastName === "" && contact === ""&& date === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.email === email && items.gender === gender) )
+      :
+      (email !== "" && status !== "") && firstname === "" && lastName === "" && contact === ""&& date === "" && postcode === "" && gender === "" 
+      ? therapists.filter((items) =>  (items.email === email && items.status === status) )
+      :
+      (email !== "" && postcode !== "") && firstname === "" && lastName === "" && contact === ""&& date === "" && status === "" && gender === "" 
+      ? therapists.filter((items) =>  (items.email === email && items.postcode.includes(postcode)))
+      :
+      (contact !== "" && firstname !== "") && email === "" && lastName === "" && date === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.phone_number === contact && items.firstname === firstname) )
+      :
+      (contact !== "" && lastName !== "") && firstname === "" && email === "" && date === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.phone_number === contact && items.lastname === lastName) )
+      :
+      (contact !== "" && email !== "") && firstname === "" && lastName === "" && date === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.email === email && items.phone_number === contact) )
+      :
+      (contact !== "" && date !== "") && firstname === "" && lastName === "" && email === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.phone_number === contact && items.Idate === date) )
+      :
+      (contact !== "" && gender !== "") && firstname === "" && lastName === "" && email === ""&& date === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.phone_number === contact && items.gender === gender) )
+      :
+      (contact !== "" && status !== "") && firstname === "" && lastName === "" && email === ""&& date === "" && postcode === "" && gender === "" 
+      ? therapists.filter((items) =>  (items.phone_number === contact && items.status === status) )
+      :
+      (contact !== "" && postcode !== "") && firstname === "" && lastName === "" && email === ""&& date === "" && status === "" && gender === "" 
+      ? therapists.filter((items) =>  (items.phone_number === contact && items.postcode.includes(postcode)))
+      :
+      (date !== "" && firstname !== "") && email === "" && lastName === "" && contact === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.Idate === date && items.firstname === firstname) )
+      :
+      (date !== "" && lastName !== "") && firstname === "" && email === "" && contact === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.Idate === date && items.lastname === lastName) )
+      :
+      (date !== "" && email !== "") && firstname === "" && lastName === "" && contact === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.email === email && items.Idate === date) )
+      :
+      (date !== "" && contact !== "") && firstname === "" && lastName === "" && email === ""&& gender === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.phone_number === contact && items.Idate === date) )
+      :
+      (date !== "" && gender !== "") && firstname === "" && lastName === "" && email === ""&& contact === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.Idate === date&& items.gender === gender) )
+      :
+      (date !== "" && status !== "") && firstname === "" && lastName === "" && email === ""&& contact === "" && postcode === "" && gender === "" 
+      ? therapists.filter((items) =>  (items.Idate === date && items.status === status) )
+      :
+      (date!== "" && postcode !== "") && firstname === "" && lastName === "" && email === ""&& contact  === "" && status === "" && gender === "" 
+      ? therapists.filter((items) =>  (items.Idate === date && items.postcode.includes(postcode)))
+      :
+      (gender !== "" && firstname !== "") && email === "" && lastName === "" && contact === "" && date === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.gender === gender && items.firstname === firstname) )
+      :
+      (gender !== "" && lastName !== "") && firstname === "" && email === "" && contact === ""&& date === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.gender === gender && items.lastname === lastName) )
+      :
+      (gender !== "" && email !== "") && firstname === "" && lastName === "" && contact === ""&& date === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.email === email && items.gender === gender) )
+      :
+      (gender !== "" && contact !== "") && firstname === "" && lastName === "" && email === "" && date === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.phone_number === contact && items.gender === gender) )
+      :
+      (gender !== "" && date !== "") && firstname === "" && lastName === "" && email === ""&& contact === "" && postcode === "" && status === "" 
+      ? therapists.filter((items) =>  (items.Idate === date && items.gender === gender) )
+      :
+      (gender !== "" && status !== "") && firstname === "" && lastName === "" && email === ""&& contact === "" && postcode === "" && date === "" 
+      ? therapists.filter((items) =>  (items.gender === gender && items.status === status) )
+      :
+      (gender !== "" && postcode !== "") && firstname === "" && lastName === "" && email === ""&& contact  === "" && status === "" && date === "" 
+      ? therapists.filter((items) =>  (items.gender === gender && items.postcode.includes(postcode)))
+      :
+      (status !== "" && firstname !== "") && email === "" && lastName === "" && contact === "" && date === "" && postcode === "" && gender === "" 
+      ? therapists.filter((items) =>  (items.status === status && items.firstname === firstname) )
+      :
+      (status !== "" && lastName !== "") && firstname === "" && email === "" && contact === ""&& date === "" && postcode === "" && gender === "" 
+      ? therapists.filter((items) =>  (items.status === status && items.lastname === lastName) )
+      :
+      (status !== "" && email !== "") && firstname === "" && lastName === "" && contact === ""&& date === "" && postcode === "" && gender === "" 
+      ? therapists.filter((items) =>  (items.email === email && items.status === status) )
+      :
+      (status !== "" && contact !== "") && firstname === "" && lastName === "" && email === "" && date === "" && postcode === "" && gender === "" 
+      ? therapists.filter((items) =>  (items.phone_number === contact && items.status === status) )
+      :
+      (status !== "" && date !== "") && firstname === "" && lastName === "" && email === ""&& contact === "" && postcode === "" && gender === "" 
+      ? therapists.filter((items) =>  (items.Idate === date && items.status === status) )
+      :
+      (gender !== "" && status !== "") && firstname === "" && lastName === "" && email === ""&& contact === "" && postcode === "" && date === "" 
+      ? therapists.filter((items) =>  (items.gender === gender && items.status === status) )
+      :
+      (status !== "" && postcode !== "") && firstname === "" && lastName === "" && email === ""&& contact  === "" && gender === "" && date === "" 
+      ? therapists.filter((items) =>  (items.status === status && items.postcode.includes(postcode)))
+      :
+      (postcode !== "" && firstname !== "") && email === "" && lastName === "" && contact === "" && date === "" && status === "" && gender === "" 
+      ? therapists.filter((items) =>  (items.postcode.includes(postcode) && items.firstname === firstname))
+      :
+      (postcode !== "" && lastName !== "") && firstname === "" && email === "" && contact === ""&& date === "" && status === "" && gender === "" 
+      ? therapists.filter((items) =>  (items.postcode.includes(postcode) && items.lastname === lastName))
+      :
+      (postcode !== "" && email !== "") && firstname === "" && lastName === "" && contact === ""&& date === "" && status === "" && gender === "" 
+      ? therapists.filter((items) =>  (items.email === email && items.postcode.includes(postcode)))
+      :
+      (postcode !== "" && contact !== "") && firstname === "" && lastName === "" && email === "" && date === "" && status === "" && gender === "" 
+      ? therapists.filter((items) =>  (items.phone_number === contact && items.postcode.includes(postcode)))
+      :
+      (postcode !== "" && date !== "") && firstname === "" && lastName === "" && email === ""&& contact === "" && status === "" && gender === "" 
+      ? therapists.filter((items) =>  (items.Idate === date && items.postcode.includes(postcode)))
+      :
+      (gender !== "" && postcode !== "") && firstname === "" && lastName === "" && email === "" && contact === "" && status === "" && date === "" 
+      ? therapists.filter((items) =>  (items.gender === gender &&items.postcode.includes(postcode)))
+      :
+      (status !== "" && postcode !== "") && firstname === "" && lastName === "" && email === ""&& contact  === "" && gender === "" && date === "" 
+      ? therapists.filter((items) =>  (items.status === status && items.postcode.includes(postcode)))
       : therapists
       
       useEffect(() => {
@@ -324,7 +495,7 @@ const TherapistSheet = () => {
           </button>
 
             &nbsp;&nbsp;
-            <Link className="btn btn-outline-info btn-sm"  data-bs-toggle="tooltip" data-bs-placement="left" title="Therapist profile"  to="/TherapistProfile" state={{ID:items.id}}>
+            <Link className="btn btn-outline-info btn-sm"  data-bs-toggle="tooltip" data-bs-placement="left" title="Therapist profile"  to={`/TherapistProfile/${items.id}`} state={{ID:items.id}}>
               <i className="fa fa-user"></i>
             </Link>&nbsp;&nbsp;
 
@@ -500,7 +671,7 @@ const TherapistSheet = () => {
                               }}
                               onChange={handleSelectGender}
                               >
-                                  <option value="none" disabled>Select</option>
+                                  <option value=" " >Select</option>
                                   <option value="Male">Male</option>
                                   <option value="Female">Female</option>
 
@@ -520,7 +691,7 @@ const TherapistSheet = () => {
                               }}
                               onChange={handleSelectStatus}
                               >
-                                  <option value="All">Select</option>
+                                  <option value=" ">Select</option>
                                   <option value="ACTIVE">ACTIVE</option>
                                   <option value="IN-ACTIVE">IN-ACTIVE</option>
 
@@ -599,7 +770,7 @@ const TherapistSheet = () => {
                 <button className="btn btn-outline-light btn-sm" onClick={handleNextPage} disabled={totalResults <= endResult}>
                   <i className="fa-solid fa-arrow-right"></i>
                 </button>
-                <p >Showing {startResult} - {endResult} of {filteredCount} results</p>
+                <p >Showing {startResult} - {endResult} of {filteredCount} results  -  total :&nbsp;&nbsp;{count}</p>
 
                     </div>
                   </div>
@@ -642,7 +813,6 @@ const TherapistSheet = () => {
                   </Modal>
 
                   {/* Query Modal Start  */}
-
                   <div className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" >
               <div className="modal-dialog" >
                 <div className="modal-content" style={{background:colorScheme.card_bg_color,color:colorScheme.card_txt_color}}>
@@ -662,8 +832,8 @@ const TherapistSheet = () => {
                 </div>
               </div>
             </div>
+            {/* Query Modal End */}
 
-                  {/* Query Modal End */}
                 </div>
               </div>
             </div>

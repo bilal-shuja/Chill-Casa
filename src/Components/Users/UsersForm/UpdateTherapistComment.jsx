@@ -1,16 +1,16 @@
 import therapistCommentEndPoints from "../../Api/TherapistComments.js";
-import {useLocation , useNavigate} from 'react-router-dom';
+import {useLocation ,useParams ,useNavigate} from 'react-router-dom';
 import "react-toastify/dist/ReactToastify.css";
 import colorScheme from '../../Colors/Styles.js';
 import { toast } from "react-toastify";
 import React,{useState} from 'react';
 
 const UpdateTherapistComment = () => {
-    const location = useLocation();
+  const location = useLocation();
   const navigate = useNavigate();
-
-    const {ID , TherapistComment,ClientName} = location.state;
-    const {mutate:UpdateTherapistComments} = therapistCommentEndPoints.useUpdateTherapistComments();
+  const {UserID} = useParams()
+  const {ID , TherapistComment,ClientName} = location.state;
+  const {mutate:UpdateTherapistComments} = therapistCommentEndPoints.useUpdateTherapistComments();
 
   
       
@@ -40,7 +40,7 @@ const UpdateTherapistComment = () => {
             }
           })
           setTimeout(() => {
-            navigate('/UserProfile')
+            navigate(`/UserProfile/${UserID}`)
           }, 2500);
         }
   
@@ -87,17 +87,17 @@ const UpdateTherapistComment = () => {
 
               <div className="card-body">
                 <div className="row">
-                    <div className="col-lg-4 col-sm-12">
+                    <div className="col-lg-12 col-sm-12">
                     <div className="form-group">
                         <label htmlFor="exampleInputEmail1">Username*</label>
                         <input type="text" name="Income" defaultValue={ClientName} className="form-control" id="exampleInputEmail2"   placeholder="Enter Account Title"   style={{   background: colorScheme.card_bg_color,color: colorScheme.card_txt_color,}} disabled/>
                     </div>
                     </div>
 
-                    <div className="col-lg-4 col-sm-12">
+                    <div className="col-lg-12 col-sm-12">
                     <div className="form-group">
                   <label htmlFor="exampleInputPassword1">Therapist Comment*</label>
-                  <input type="text" name="Quantity" defaultValue={TherapistComment} className={updateComment === ''&& input === true?"form-control border border-danger":"form-control"} id="exampleInputPassword3"  onChange={(e)=>setUpdateComment(e.target.value)} placeholder="Enter Comment" style={{   background: colorScheme.card_bg_color,color: colorScheme.card_txt_color,}} />
+                  <textarea type="text" name="Quantity" defaultValue={TherapistComment} className={updateComment === ''&& input === true?"form-control border border-danger":"form-control"} id="exampleInputPassword3"  onChange={(e)=>setUpdateComment(e.target.value)} placeholder="Enter Comment" style={{   background: colorScheme.card_bg_color,color: colorScheme.card_txt_color,}} rows={4}/>
                     </div>
                     </div>
 

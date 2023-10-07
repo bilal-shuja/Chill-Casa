@@ -70,7 +70,6 @@ const UpdateUserForm = () => {
         .catch((error)=>{
           setLoading(false)
           toast.warn("Something went wrong",{theme:"dark"})
-          console.log(error)
         })
       }
       useEffect(() => {

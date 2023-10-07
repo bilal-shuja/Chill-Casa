@@ -1,4 +1,4 @@
-import {useLocation , useNavigate} from 'react-router-dom';
+import {useParams,useLocation , useNavigate} from 'react-router-dom';
 import colorScheme from '../../Colors/Styles.js';
 import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
@@ -7,6 +7,7 @@ import axios from 'axios';
 const UpdateAdminNote = () => {
   const location = useLocation();
   const {ID} = location.state;
+  const {UserID} = useParams()
   const {Note} = location.state;
   const navigate = useNavigate();
 
@@ -31,11 +32,10 @@ const UpdateAdminNote = () => {
         setLoading(false)
         setInput(false)
         setTimeout(() => {
-          navigate('/UserProfile')
+          navigate(`/UserProfile/${UserID}`)
         }, 2500);
       })
       .catch((err)=>{
-          console.log(err)
           toast.warn("Something went wrong",{theme:"dark"}) 
           setLoading(false)
           setInput(false)
@@ -83,7 +83,7 @@ const UpdateAdminNote = () => {
                     <div className="col-lg-12">
                     <div className="form-group">
                         <label htmlFor="exampleInputEmail7">Notes*</label>
-                        <textarea type="text" name="adminNote"  className="form-control" id="exampleInputEmail7" defaultValue={Note} onChange={(e)=>setAdminNote(e.target.value)}  style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} rows={6}/>
+                        <textarea type="text" name="adminNote"  className="form-control" id="exampleInputEmail7" defaultValue={Note} onChange={(e)=>setAdminNote(e.target.value)}  style={{background:colorScheme.card_bg_color, color:colorScheme.card_txt_color}} rows={4}/>
         
                     </div>
                     </div>

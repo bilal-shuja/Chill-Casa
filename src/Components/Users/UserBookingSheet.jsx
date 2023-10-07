@@ -2,6 +2,7 @@ import usersEndPoint from '../Api/UserEndPoint.js';
 import React,{useState , useEffect} from 'react';
 import "react-toastify/dist/ReactToastify.css";
 import colorScheme from '../Colors/Styles.js';
+import ReadMoreReact from "read-more-react";
 import {Link} from 'react-router-dom';
 import {useQuery} from 'react-query';
 import { Modal } from "pretty-modal";
@@ -179,8 +180,10 @@ const UserBookingSheet = () => {
                           <th>#</th>
                         <th>Client Name</th>
                         <th>Therapist Name</th>
+                        <th>Address</th>
                         <th>Booking Date</th>
                         <th>Booking Time</th>
+                        <th>Services</th>
                         <th>Price</th>
                         <th>Duration</th>
                         <th>Status</th>
@@ -196,8 +199,29 @@ const UserBookingSheet = () => {
                             <td>{index+1}</td>
                             <td>{items.username}</td>
                             <td>{items.therapist_name}</td>
+
+                            <td>  
+                              <ReadMoreReact
+                                      text={items.address}
+                                      min={10}
+                                      ideal={15}
+                                      max={25}
+                                      readMoreText="...Read More"
+                                    />
+                                    </td>
                              <td>{items.date}</td>
                              <td>{items.time}</td>
+                             <td>{items?.category_name?.map((item)=>{
+                              return(
+                                <li
+                                key={item}
+                                className="text-center"
+                                style={{ listStyleType: "none" }}
+                              >
+                                {item}
+                              </li>
+                              )
+                             })}</td>
                             <td>{items.price}</td>
                             <td>{items.duration}</td>
                             {
@@ -216,14 +240,12 @@ const UserBookingSheet = () => {
                             }
                             <td>
                              <div className="d-flex justify-content-center">
-                             <Link className="btn btn-outline-info btn-sm" to="/UpdateBookingDateTime" state={{ID:items.booking_id , Date:items.date , Time:items.time}}>
+                             <Link className="btn btn-outline-info btn-sm" to="/UpdateBookingDateTime" state={{ID:items.booking_id , Date:items.date , Time:items.time , Address:items.address , CategoryName: items.category_name}}>
                                   <i className="fa fa-pen"></i>
                                 </Link>&nbsp;&nbsp;
                               {/* <button className="btn btn-outline-danger btn-sm" onClick={()=>deletePayment(items.id)}>
                                   <i className="fa fa-trash"></i>
                                 </button> */}
-
-                                
                                       <button
                                         onClick={() => {
                                           setIsOpen(true);
